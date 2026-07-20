@@ -1,0 +1,6 @@
+{
+  "name": "GeoGlypher",
+  "description": "A spaceship crop-circle drawing game played by grey aliens using SVG path directives.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

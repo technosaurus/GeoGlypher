@@ -1,0 +1,1251 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>GeoGlypher - Alien Inscription Console</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="crt-overlay"></div>
+    <div class="scanlines"></div>
+
+    <div class="cockpit">
+      <!-- TOP HEADER BAR: Ship Systems -->
+      <header class="hud-header">
+        <div class="header-left">
+          <div class="glowing-node"></div>
+          <div class="system-title">
+            <h1>👽 GEOGLYPHER v4.1</h1>
+            <span class="sub-system">🛸 STEALTH ORBITAL ENGRAVER</span>
+          </div>
+        </div>
+        <div class="header-right">
+          <div class="status-stat">
+            <span class="label">👽 PILOT</span>
+            <span class="value lavender-glow" id="hud-pilot-name">GUEST (OFFLINE)</span>
+          </div>
+          <div class="status-stat">
+            <span class="label">🛡️ CLOAK</span>
+            <span class="value green-glow animate-pulse">98.4%</span>
+          </div>
+          <div class="status-stat">
+            <span class="label">⚡ PLASMA</span>
+            <span class="value cyan-glow" id="plasma-charge">100%</span>
+          </div>
+          <div class="status-stat">
+            <span class="label">👁️ DETECTION</span>
+            <span class="value red-glow" id="detection-risk">MINIMAL</span>
+          </div>
+        </div>
+      </header>
+
+      <!-- MAIN BODY: Single Screen Overlay-Driven Deck Layout -->
+      <main class="hud-main">
+        <!-- MAIN TACTICAL VIEWPORT -->
+        <section class="hud-panel hud-center" id="panel-map">
+          <div class="scanner-viewport">
+            <div class="scanner-container" id="scanner-container">
+              <!-- Canvas 1: Procedural Farmland/Earth Background -->
+              <canvas id="earth-canvas" width="500" height="500"></canvas>
+
+              <!-- SVG Overlay: Handles drawing and ship representations -->
+              <svg
+                id="svg-drawing-plane"
+                width="500"
+                height="500"
+                viewBox="0 0 500 500"
+              >
+                <defs>
+                  <filter
+                    id="laser-glow"
+                    x="-20%"
+                    y="-20%"
+                    width="140%"
+                    height="140%"
+                  >
+                    <feGaussianBlur stdDeviation="3" result="blur" />
+                    <feMerge>
+                      <feMergeNode in="blur" />
+                      <feMergeNode in="SourceGraphic" />
+                    </feMerge>
+                  </filter>
+                  <filter
+                    id="target-glow"
+                    x="-20%"
+                    y="-20%"
+                    width="140%"
+                    height="140%"
+                  >
+                    <feGaussianBlur stdDeviation="2" result="blur" />
+                    <feMerge>
+                      <feMergeNode in="blur" />
+                      <feMergeNode in="SourceGraphic" />
+                    </feMerge>
+                  </filter>
+                </defs>
+
+                <!-- Target Path (Semi-transparent guidelines) -->
+                <path
+                  id="svg-target-path"
+                  d=""
+                  fill="none"
+                  stroke="rgba(0, 240, 255, 0.45)"
+                  stroke-width="7"
+                  stroke-dasharray="6,4"
+                  filter="url(#target-glow)"
+                />
+
+                <!-- User Carved Path -->
+                <path
+                  id="svg-user-path"
+                  d=""
+                  fill="none"
+                  stroke="#00ffcc"
+                  stroke-width="8"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  filter="url(#laser-glow)"
+                />
+              </svg>
+
+              <!-- Spaceship Saucer overlay (Absolute HTML Element) -->
+              <div
+                id="ufo-saucer"
+                class="ufo-container difficulty-easy"
+                style="left: 50%; top: 50%"
+              >
+                <div class="beam-light"></div>
+                <div class="saucer-core">
+                  <div class="cabin-lights"></div>
+                  <div class="stealth-hull"></div>
+                  <div class="jet-thrusters"></div>
+                  <div class="aux-hull-left"></div>
+                  <div class="aux-hull-right"></div>
+                  <div class="solar-panels"></div>
+                  <div class="antenna-spire"></div>
+                </div>
+              </div>
+
+              <!-- Coordinate Grid lines -->
+              <div class="grid-overlay"></div>
+              <div class="scanner-radar-swipe"></div>
+
+              <!-- ==========================================
+                 TOP MENU OVERLAY (Pilot control menus on top)
+                 ========================================== -->
+              <div class="top-control-overlay">
+                <div class="top-overlay-left">
+                  <!-- Alien Glyph Button: opens the unified Mission Control & Difficulty Selection Modal -->
+                  <button
+                    id="btn-open-missions"
+                    class="glyph-btn alien-glyph-trigger animate-pulse-glow"
+                    title="Select Target Mission & Difficulty (👽)"
+                  >
+                    <span style="font-size: 16px; font-weight: bold">👽</span>
+                  </button>
+
+                  <!-- Hidden elements for complete backward compatibility with script.js selectors -->
+                  <div
+                    class="level-select-glow"
+                    style="display: none !important"
+                  >
+                    <select id="glyph-select" class="neon-select-minimal">
+                      <!-- Dynamically populated -->
+                    </select>
+                  </div>
+                  <div
+                    class="current-glyph-hud"
+                    style="display: none !important"
+                  >
+                    <span id="glyph-name" class="cyan-glow"
+                      >Roswell Propeller</span
+                    >
+                    <span id="glyph-difficulty" class="difficulty-tag-minimal"
+                      >EASY</span
+                    >
+                  </div>
+                </div>
+
+                <div class="top-overlay-center">
+                  <div class="hud-status-badge" id="coordinates-hud">
+                    X: 250 | Y: 250
+                  </div>
+                </div>
+
+                <div class="top-overlay-right">
+                  <!-- Autopilot steering toggle button -->
+                  <button
+                    id="btn-toggle-flight-overlay"
+                    class="glyph-btn"
+                    title="Toggle Ship Autopilot Thrust Steering"
+                  >
+                    <svg viewBox="0 0 24 24" class="glyph-svg">
+                      <circle
+                        cx="12"
+                        cy="12"
+                        r="9"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                      />
+                      <circle cx="12" cy="12" r="3" fill="currentColor" />
+                      <path
+                        d="M12 2v4M12 18v4M2 12h4M18 12h4"
+                        stroke="currentColor"
+                        stroke-width="2"
+                      />
+                    </svg>
+                  </button>
+                  <!-- Undo Path Button -->
+                  <button
+                    id="btn-undo"
+                    class="glyph-btn"
+                    title="Undo Last Waypoint (↩️)"
+                  >
+                    <svg viewBox="0 0 24 24" class="glyph-svg">
+                      <path
+                        d="M21 11a9 9 0 1 0-9 9m0-18v3"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                      />
+                      <path
+                        d="M12 11L7 16l5 5"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linejoin="round"
+                        stroke-linecap="round"
+                      />
+                    </svg>
+                  </button>
+                  <!-- Abort/Clear Button -->
+                  <button
+                    id="btn-clear"
+                    class="glyph-btn abort-btn"
+                    title="Reset Drawing Canvas (❌)"
+                  >
+                    <svg viewBox="0 0 24 24" class="glyph-svg">
+                      <path
+                        d="M19 7l-.8 13.3A2 2 0 0 1 16.2 22H7.8a2 2 0 0 1-2-1.7L5 7M3 7h18M8 7V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v3"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linejoin="round"
+                      />
+                    </svg>
+                  </button>
+                  <!-- FIRE PLASMA BEAM Button -->
+                  <button
+                    id="btn-beam"
+                    class="glyph-btn fire-beam-btn animate-pulse-glow"
+                    title="FIRE PLASMA BEAM (⚡)"
+                  >
+                    <svg viewBox="0 0 24 24" class="glyph-svg-filled">
+                      <path
+                        d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"
+                        fill="currentColor"
+                      />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
+              <!-- ==========================================
+                 LEFT TOOL SELECTORS (Drawing tools vertical)
+                 ========================================== -->
+              <div class="left-selector-overlay">
+                <button
+                  class="tool-glyph-btn"
+                  id="tool-btn-m"
+                  data-cmd="m"
+                  title="🛰️ GPS Sector Start (Move - M)"
+                >
+                  <svg viewBox="0 0 24 24" class="glyph-svg">
+                    <circle cx="12" cy="12" r="3" fill="currentColor" />
+                    <path
+                      d="M12 2v4M12 18v4M2 12h4M18 12h4"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                    />
+                  </svg>
+                </button>
+                <button
+                  class="tool-glyph-btn"
+                  id="tool-btn-l"
+                  data-cmd="l"
+                  title="➡️ Laser Straight Line Vector (l)"
+                >
+                  <svg viewBox="0 0 24 24" class="glyph-svg">
+                    <line
+                      x1="4"
+                      y1="20"
+                      x2="20"
+                      y2="4"
+                      stroke="currentColor"
+                      stroke-width="3"
+                      stroke-linecap="round"
+                    />
+                    <circle cx="4" cy="20" r="2.5" fill="currentColor" />
+                    <circle cx="20" cy="4" r="2.5" fill="currentColor" />
+                  </svg>
+                </button>
+                <button
+                  class="tool-glyph-btn"
+                  id="tool-btn-c"
+                  data-cmd="c"
+                  title="🌀 Curved Spline Arc (Cubic Bezier - c)"
+                >
+                  <svg viewBox="0 0 24 24" class="glyph-svg">
+                    <path
+                      d="M4 18 C 8 4, 16 4, 20 18"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="3"
+                      stroke-linecap="round"
+                    />
+                    <circle cx="4" cy="18" r="2" fill="currentColor" />
+                    <circle cx="20" cy="18" r="2" fill="currentColor" />
+                    <line
+                      x1="8"
+                      y1="4"
+                      x2="8"
+                      y2="8"
+                      stroke="currentColor"
+                      stroke-width="1"
+                      stroke-dasharray="2,2"
+                    />
+                    <circle cx="8" cy="4" r="1.5" fill="currentColor" />
+                  </svg>
+                </button>
+                <button
+                  class="tool-glyph-btn"
+                  id="tool-btn-h"
+                  data-cmd="h"
+                  title="↔️ Horizontal Crop Cut (h)"
+                >
+                  <svg viewBox="0 0 24 24" class="glyph-svg">
+                    <line
+                      x1="2"
+                      y1="12"
+                      x2="22"
+                      y2="12"
+                      stroke="currentColor"
+                      stroke-width="3"
+                      stroke-linecap="round"
+                    />
+                    <path
+                      d="M6 8l-4 4 4 4M18 8l4 4-4 4"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                    />
+                  </svg>
+                </button>
+                <button
+                  class="tool-glyph-btn"
+                  id="tool-btn-v"
+                  data-cmd="v"
+                  title="↕️ Vertical Crop Cut (v)"
+                >
+                  <svg viewBox="0 0 24 24" class="glyph-svg">
+                    <line
+                      x1="12"
+                      y1="2"
+                      x2="12"
+                      y2="22"
+                      stroke="currentColor"
+                      stroke-width="3"
+                      stroke-linecap="round"
+                    />
+                    <path
+                      d="M8 6l4-4 4 4M8 18l4 4 4-4"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                    />
+                  </svg>
+                </button>
+                <button
+                  class="tool-glyph-btn"
+                  id="tool-btn-z"
+                  data-cmd="z"
+                  title="🔒 Close & Seal Crop Loop (z)"
+                >
+                  <svg viewBox="0 0 24 24" class="glyph-svg">
+                    <path
+                      d="M12 2A5 5 0 0 0 7 7v4H5v11h14V11h-2V7a5 5 0 0 0-5-5zm-3 5a3 3 0 0 1 6 0v4H9V7zm3 7a2 2 0 1 1-2 2 2 2 0 0 1 2-2z"
+                      fill="currentColor"
+                    />
+                  </svg>
+                </button>
+
+                <!-- Hidden selectors to keep compatibility with script.js unchanged -->
+                <select
+                  id="select-new-command"
+                  style="display: none !important"
+                >
+                  <option value="l" selected>l</option>
+                  <option value="c">c</option>
+                  <option value="h">h</option>
+                  <option value="v">v</option>
+                  <option value="z">z</option>
+                </select>
+                <button
+                  id="btn-add-vector-step"
+                  style="display: none !important"
+                ></button>
+              </div>
+
+              <!-- ==========================================
+                 RIGHT WAYPOINTS COLUMN OVERLAY
+                 ========================================== -->
+              <div class="right-command-overlay">
+                <div class="overlay-panel-header">
+                  <span class="panel-title">WAYPOINTS</span>
+                  <button
+                    id="btn-toggle-raw-compiler"
+                    class="compiler-toggle-btn"
+                    title="Toggle Raw SVG Path Editor"
+                  >
+                    CODE
+                  </button>
+                </div>
+
+                <!-- Waypoint list view -->
+                <div id="waypoint-list-view" class="overlay-list-view">
+                  <div class="steps-scroll-container" id="steps-list">
+                    <!-- Dynamically populated by JS -->
+                  </div>
+                </div>
+
+                <!-- Raw compiler SVG editor (hidden by default) -->
+                <div id="raw-compiler-view" class="overlay-list-view hidden">
+                  <div class="raw-editor-header">RAW SVG CODE</div>
+                  <div class="editor-wrapper-minimal">
+                    <span class="prompt-char">d="</span>
+                    <textarea
+                      id="svg-code-input"
+                      class="svg-minimal-textarea"
+                      spellcheck="false"
+                      placeholder="l 50 0 v 50 z"
+                    ></textarea>
+                    <span class="prompt-char">"</span>
+                  </div>
+                  <div class="syntax-bar-minimal">
+                    <button class="syntax-btn-mini" data-cmd="M">M</button>
+                    <button class="syntax-btn-mini" data-cmd="L">L</button>
+                    <button class="syntax-btn-mini" data-cmd="C">C</button>
+                    <button class="syntax-btn-mini" data-cmd="H">H</button>
+                    <button class="syntax-btn-mini" data-cmd="V">V</button>
+                    <button class="syntax-btn-mini" data-cmd="Z">Z</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- ==========================================
+                 COHERENCE & HOLOGRAM OVERLAY (Bottom-Left Deck)
+                 ========================================== -->
+              <div class="coherence-hologram-overlay">
+                <div class="coherence-sub-title">🌌 MATRIX BLUEPRINT</div>
+
+                <div class="coherence-grid-deck">
+                  <div class="hologram-preview-box">
+                    <canvas
+                      id="target-canvas"
+                      width="160"
+                      height="160"
+                    ></canvas>
+                    <span class="canvas-lbl">🎯 TARGET</span>
+                  </div>
+
+                  <div class="coherence-mini-ring">
+                    <svg class="coherence-svg-ring" viewBox="0 0 100 100">
+                      <circle class="ring-bg" cx="50" cy="50" r="40" />
+                      <circle
+                        class="ring-fg"
+                        id="coherence-ring"
+                        cx="50"
+                        cy="50"
+                        r="40"
+                        stroke-dasharray="251.2"
+                        stroke-dashoffset="251.2"
+                      />
+                    </svg>
+                    <div class="coherence-percentage" id="coherence-percentage">
+                      0.0%
+                    </div>
+                    <span class="coherence-lbl">🧬 COHERENCE</span>
+                  </div>
+                </div>
+
+                <div class="coherence-text-stats">
+                  <div class="mini-stat-line">
+                    <span class="lbl">🔗 ALIGN:</span>
+                    <span class="val cyan-glow" id="match-rating-badge"
+                      >CALIBRATING</span
+                    >
+                  </div>
+                  <div class="mini-stat-line">
+                    <span class="lbl">📊 RATE:</span>
+                    <span class="val" id="match-rating-label">UNALIGNED</span>
+                  </div>
+                  <div class="mini-stat-line">
+                    <span class="lbl">👁️ HUMAN:</span>
+                    <span class="val red-glow" id="human-comprehension-label"
+                      >0%</span
+                    >
+                  </div>
+                  <div class="mini-stat-line">
+                    <span class="lbl">🏆 RANK:</span>
+                    <span class="val green-glow" id="rank-projection-label"
+                      >NOT SUBMITTED</span
+                    >
+                  </div>
+                </div>
+
+                <!-- Direct logo projection for free, standard support -->
+                <div class="iap-upgrade-container-minimal">
+                  <div id="logo-upload-container">
+                    <label
+                      for="logo-file-input"
+                      class="logo-upload-label-minimal animate-pulse-glow"
+                      style="display: block; text-align: center; font-weight: bold; padding: 6px; border: 1.5px dashed var(--border-neon); cursor: pointer;"
+                      >🛸 PROJECT CUSTOM LOGO (FREE)</label
+                    >
+                    <input
+                      type="file"
+                      id="logo-file-input"
+                      class="hidden-input"
+                      accept="image/png, image/jpeg"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <!-- ==========================================
+                 FLIGHT CONTROL OVERLAY (Virtual Flight Deck Cockpit)
+                 ========================================== -->
+              <div
+                class="flight-panel-overlay minimized"
+                id="flight-panel-overlay"
+              >
+                <div class="flight-overlay-header" id="flight-overlay-header">
+                  <span class="flight-title"
+                    >🛸 AUTOPILOT STEERING COCKPIT</span
+                  >
+                  <button
+                    class="flight-toggle-btn"
+                    id="btn-toggle-flight-overlay-inner"
+                  >
+                    EXPAND
+                  </button>
+                </div>
+                <div
+                  class="flight-overlay-content hidden"
+                  id="flight-overlay-content"
+                >
+                  <div class="ufo-joystick-panel">
+                    <div class="joystick-ring">
+                      <button
+                        class="joy-btn dir-n"
+                        data-dir="n"
+                        title="Fly North"
+                      >
+                        ▲
+                      </button>
+                      <button
+                        class="joy-btn dir-ne"
+                        data-dir="ne"
+                        title="Fly North-East"
+                      >
+                        ▲►
+                      </button>
+                      <button
+                        class="joy-btn dir-e"
+                        data-dir="e"
+                        title="Fly East"
+                      >
+                        ▶
+                      </button>
+                      <button
+                        class="joy-btn dir-se"
+                        data-dir="se"
+                        title="Fly South-East"
+                      >
+                        ▼►
+                      </button>
+                      <button
+                        class="joy-btn dir-s"
+                        data-dir="s"
+                        title="Fly South"
+                      >
+                        ▼
+                      </button>
+                      <button
+                        class="joy-btn dir-sw"
+                        data-dir="sw"
+                        title="Fly South-West"
+                      >
+                        ▼◄
+                      </button>
+                      <button
+                        class="joy-btn dir-w"
+                        data-dir="w"
+                        title="Fly West"
+                      >
+                        ◀
+                      </button>
+                      <button
+                        class="joy-btn dir-nw"
+                        data-dir="nw"
+                        title="Fly North-West"
+                      >
+                        ▲◄
+                      </button>
+                      <div class="joy-center">
+                        <span class="thruster-core"></span>
+                      </div>
+                    </div>
+
+                    <div class="pilot-configs">
+                      <div class="config-row">
+                        <span class="config-label">LASER CUTTER</span>
+                        <div class="toggle-container">
+                          <button
+                            id="btn-laser-toggle"
+                            class="toggle-btn active"
+                          >
+                            ACTIVE
+                          </button>
+                          <button id="btn-hover-toggle" class="toggle-btn">
+                            HOVER
+                          </button>
+                        </div>
+                      </div>
+                      <div class="config-row">
+                        <span class="config-label">STEP RANGE</span>
+                        <div class="slider-container">
+                          <input
+                            type="range"
+                            id="step-slider"
+                            min="10"
+                            max="60"
+                            value="30"
+                          />
+                          <span id="step-value" class="cyan-glow">30px</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- ==========================================
+                 TRANSMISSION DRAWER OVERLAY (Collapsible Bottom)
+                 ========================================== -->
+              <div
+                class="transmission-drawer-overlay minimized"
+                id="transmission-drawer"
+              >
+                <div class="drawer-header" id="btn-toggle-drawer">
+                  <span>📡 COMM & RANKINGS LINK</span>
+                  <span id="drawer-toggle-arrow">▲ EXPAND</span>
+                </div>
+                <div class="drawer-subheader-tabs">
+                  <button id="btn-tab-comms" class="drawer-tab-btn active">
+                    💬 RADIO
+                  </button>
+                  <button id="btn-tab-leaderboard" class="drawer-tab-btn">
+                    🏆 RANKS
+                  </button>
+                </div>
+                <div class="drawer-content hidden" id="drawer-content">
+                  <div class="log-console-mini" id="transmission-log-console">
+                    <div class="log-line text-system">
+                      [SYSTEM] Quantum propulsion stabilized. Orbiting Wiltshire
+                      county, England.
+                    </div>
+                    <div class="log-line text-alien">
+                      [COMM] <span class="alien-name">Xylar</span>: Welcome
+                      aboard Inscribed-Pod 9. Let's engrave Wiltshire fields.
+                    </div>
+                    <div class="log-line text-alien">
+                      [COMM] <span class="alien-name">Zorblax</span>: Remember,
+                      keep the SVG path lines exact, or the scientific community
+                      will suspect artificial spacecraft!
+                    </div>
+                  </div>
+                  <div class="log-console-mini hidden" id="leaderboard-console">
+                    <table class="leaderboard-table">
+                      <tbody id="leaderboard-body">
+                        <!-- Dynamically populated by JS -->
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Score submission block floating over map when complete -->
+              <div class="log-input-area hidden" id="submission-box">
+                <span class="input-prompt">👽 CODENAME:</span>
+                <input
+                  type="text"
+                  id="pilot-codename-input"
+                  maxlength="12"
+                  placeholder="Zorg"
+                />
+                <button id="btn-submit-score" class="submit-score-btn">
+                  📡 TRANSMIT
+                </button>
+              </div>
+            </div>
+            <!-- /scanner-container -->
+          </div>
+          <!-- /scanner-viewport -->
+        </section>
+      </main>
+    </div>
+
+    <!-- MODAL 1: PILOT AUTH CHAMBER -->
+    <div id="auth-modal" class="modal-overlay hidden">
+      <div class="modal-box">
+        <div class="modal-header">
+          <span class="modal-title">PILOT SYNAPSE CONNECTION</span>
+          <button class="modal-close-btn" id="btn-close-auth">&times;</button>
+        </div>
+        <div class="modal-tabs">
+          <button class="modal-tab-btn active" id="modal-tab-login">
+            LINK CONSCIOUSNESS (LOGIN)
+          </button>
+          <button class="modal-tab-btn" id="modal-tab-register">
+            CLONE INDIVIDUALITY (REGISTER)
+          </button>
+        </div>
+
+        <!-- Login Panel -->
+        <div class="modal-panel-content" id="panel-login">
+          <p class="modal-intro">
+            Establish dynamic neuro-link using your registered stellar
+            identifier credentials.
+          </p>
+          <div class="modal-input-group">
+            <label>👽 CODENAME / ALIEN IDENTITY</label>
+            <input type="text" id="login-username" placeholder="e.g. Zorg" />
+          </div>
+          <div class="modal-input-group">
+            <label>QUANTUM KEYPASS (PASSWORD)</label>
+            <input type="password" id="login-password" placeholder="••••••••" />
+          </div>
+          <div class="modal-actions">
+            <button id="btn-login-submit" class="modal-primary-btn">
+              INITIALIZE NEURO-LINK
+            </button>
+          </div>
+        </div>
+
+        <!-- Register Panel -->
+        <div class="modal-panel-content hidden" id="panel-register">
+          <p class="modal-intro">
+            Synthesize a new unique pilot identity core within the Intergalactic
+            Registry.
+          </p>
+          <div class="modal-input-group">
+            <label>👽 CHOSEN CODENAME</label>
+            <input type="text" id="register-username" placeholder="e.g. Zorg" />
+          </div>
+          <div class="modal-input-group">
+            <label>QUANTUM KEYPASS (PASSWORD)</label>
+            <input
+              type="password"
+              id="register-password"
+              placeholder="••••••••"
+            />
+          </div>
+          <div class="modal-input-group">
+            <label>PILOT SPECIES EXTRACT</label>
+            <select id="register-species">
+              <option value="Grey">Species-5827 (Zeta Reticuli Grey)</option>
+              <option value="Reptilian">Draconian Shape-shifter</option>
+              <option value="Pleiadian">Nordic Pleiadian Star-seed</option>
+              <option value="Anunnaki">Ancient Sumerian Gold-Seeker</option>
+            </select>
+          </div>
+          <div class="modal-actions">
+            <button id="btn-register-submit" class="modal-primary-btn">
+              CLONE CORE IDENTITY
+            </button>
+          </div>
+        </div>
+
+        <!-- Logged In / Profile Panel -->
+        <div class="modal-panel-content hidden" id="panel-profile">
+          <div class="profile-card">
+            <div class="avatar-holder">👽</div>
+            <div class="profile-details">
+              <h4 id="profile-codename">PILOT_CODENAME</h4>
+              <p id="profile-species">Species: Zeta Reticuli Grey</p>
+              <p id="profile-xp">Flight Training: 0 XP</p>
+            </div>
+          </div>
+          <div class="pilot-history">
+            <h5>PERSONAL GLYPH CHRONOLOGY</h5>
+            <div class="history-list" id="profile-history-list">
+              <div class="no-records">No orbital glyphs transmitted yet.</div>
+            </div>
+          </div>
+          <div class="modal-actions">
+            <button id="btn-logout" class="modal-secondary-btn">
+              SEVER SYNAPTIC TUNNEL (LOGOUT)
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL 2: IN-APP PURCHASE BRANDED CROP CIRCLES -->
+    <div id="iap-modal" class="modal-overlay hidden">
+      <div class="modal-box">
+        <div class="modal-header">
+          <span class="modal-title">⚡ GALACTIC EMBRANDING MODULE</span>
+          <button class="modal-close-btn" id="btn-close-iap">&times;</button>
+        </div>
+        <div class="modal-panel-content">
+          <div class="iap-badge">$999.00 USD ONE-TIME CHARGE</div>
+          <p class="modal-intro">
+            Authorize an orbital beam projection license. This module permits
+            you to upload high-definition terrestrial PNG branding assets and
+            automatically encode them onto Salisbury fields for maximum
+            planetary brand visibility!
+          </p>
+
+          <div class="billing-form">
+            <div class="modal-input-group">
+              <label>STELLAR BANKING COMPACT CARD</label>
+              <input
+                type="text"
+                id="billing-card"
+                placeholder="5827 • 9422 • 0101 • 9999"
+              />
+            </div>
+            <div class="input-row-flex">
+              <div class="modal-input-group half">
+                <label>SOLAR ECLIPSE (EXP)</label>
+                <input type="text" id="billing-exp" placeholder="08 / 29" />
+              </div>
+              <div class="modal-input-group half">
+                <label>NEBULA ENCRYPTION (CVV)</label>
+                <input type="password" id="billing-cvv" placeholder="•••" />
+              </div>
+            </div>
+            <div class="modal-input-group">
+              <label>SECTOR COORDINATE ZIP</label>
+              <input type="text" id="billing-zip" placeholder="NEBULA-992" />
+            </div>
+          </div>
+
+          <!-- Progress Spinner (hidden initially) -->
+          <div id="iap-processing" class="processing-overlay hidden">
+            <div class="spinner"></div>
+            <span class="processing-text">TRANSMITTING QUANTUM ASSETS...</span>
+          </div>
+
+          <div class="modal-actions">
+            <button id="btn-purchase-confirm" class="modal-primary-btn">
+              AUTHORIZE $999.00 USD PAYMENT
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL 3: FLIGHT ACADEMY INTERACTIVE TUTORIAL WIZARD -->
+    <div id="tutorial-modal" class="modal-overlay hidden">
+      <div class="modal-box tutorial-box">
+        <div class="modal-header">
+          <span class="modal-title">🛸 INTERACTIVE FLIGHT ACADEMY</span>
+          <button class="modal-close-btn" id="btn-close-tutorial">
+            &times;
+          </button>
+        </div>
+        <div class="modal-panel-content">
+          <!-- Visual Progress Bar -->
+          <div class="tutorial-progress-bar">
+            <div class="progress-step active" data-step="1"></div>
+            <div class="progress-step" data-step="2"></div>
+            <div class="progress-step" data-step="3"></div>
+            <div class="progress-step" data-step="4"></div>
+            <div class="progress-step" data-step="5"></div>
+          </div>
+
+          <div id="tutorial-step-content-1" class="tutorial-step-pane">
+            <div class="tut-hero">🌌</div>
+            <h4>PILOT PREMISE & OBJECTIVE</h4>
+            <p>
+              Welcome, Recruit! You are pilot of Inscribed-Pod 9 orbiting
+              Wiltshire county, England. Our mission is to encode sacred
+              geometric vector coordinates onto human farmland using our ship's
+              high-intensity **Plasma Beam Emitters**.
+            </p>
+            <p>
+              Humans believe these beautiful circular patterns are 'Crop
+              Circles' caused by weather anomalies. We must keep our accuracy
+              high so scientists do not discover the truth!
+            </p>
+          </div>
+
+          <div id="tutorial-step-content-2" class="tutorial-step-pane hidden">
+            <h4>EXPLORING THE COCKPIT HUD</h4>
+            <p>Let's review your console screens:</p>
+            <ul class="hud-tour-list">
+              <li>
+                <strong>Left Panel:</strong> Target profile display. Shows the
+                sector crop pattern and holographic blueprint preview.
+              </li>
+              <li>
+                <strong>Center Viewport:</strong> Dynamic tactical scanner.
+                Displays physical farm fields below, the laser overlay, and your
+                ship position.
+              </li>
+              <li>
+                <strong>Right Panel:</strong> Laser-beam control console. You
+                can either type SVG code commands directly or steer manually via
+                autopilot thrust keys.
+              </li>
+              <li>
+                <strong>Bottom Panel:</strong> Intergalactic crew radio and
+                quantum coherence accuracy percentage meter.
+              </li>
+            </ul>
+          </div>
+
+          <div id="tutorial-step-content-3" class="tutorial-step-pane hidden">
+            <h4>STEP 3: AUTOPILOT STEERING (INTERACTIVE)</h4>
+            <p class="interactive-instruction">
+              Try steering the spaceship manually using the navigation computer!
+            </p>
+            <p>
+              Select the <strong>SHIP AUTOPILOT</strong> tab on the right
+              console panel and press any directional thrust key (e.g.
+              <strong>▲</strong> or <strong>▶</strong>) to steer your ship!
+            </p>
+            <div class="tutorial-interactive-box" id="tut-interactive-joystick">
+              <span class="checkpoint-indicator red" id="tut-step3-chk"
+                >❌ WAITING FOR SPACESHIP STEERING MOVEMENT</span
+              >
+            </div>
+          </div>
+
+          <div id="tutorial-step-content-4" class="tutorial-step-pane hidden">
+            <h4>STEP 4: SVG VECTOR PROGRAMMING (INTERACTIVE)</h4>
+            <p>
+              Autopilot movements are translated into **SVG Path Directives**
+              inside the **PLASMA CODER** tab on the right panel:
+            </p>
+            <div class="syntax-guide-table">
+              <div>
+                <code>M X Y</code> - <strong>Move cursor</strong> to position
+                without cutting crops.
+              </div>
+              <div>
+                <code>L X Y</code> - <strong>Line cut</strong> directly to
+                coordinate.
+              </div>
+              <div>
+                <code>C x1 y1 x2 y2 X Y</code> -
+                <strong>Bezier curve</strong> path.
+              </div>
+              <div>
+                <code>Z</code> - <strong>Close path</strong> back to the initial
+                coordinates.
+              </div>
+            </div>
+            <p class="interactive-instruction">
+              Select the <strong>PLASMA CODER</strong> tab and click the
+              <code>L [X] [Y]</code> helper button, or enter an SVG command in
+              the code area.
+            </p>
+            <div class="tutorial-interactive-box" id="tut-interactive-code">
+              <span class="checkpoint-indicator red" id="tut-step4-chk"
+                >❌ WAITING FOR CODE MODIFICATION</span
+              >
+            </div>
+          </div>
+
+          <div id="tutorial-step-content-5" class="tutorial-step-pane hidden">
+            <h4>STEP 5: FIRE PLASMA BEAM & CALIBRATE</h4>
+            <p>
+              Once your path coordinates align with the hologram matrix on the
+              map, click the glowing green **FIRE PLASMA BEAM** button on the
+              bottom right!
+            </p>
+            <p>
+              This will physically guide your ship through the flight
+              trajectory, firing high-temperature plasma to engrave the field.
+              The computer will then compute your **Quantum Coherence Score**
+              based on overlap accuracy!
+            </p>
+            <p class="interactive-instruction">
+              Click the <strong>FIRE PLASMA BEAM</strong> button now to execute
+              your calibrated sweep!
+            </p>
+            <div class="tutorial-interactive-box">
+              <span class="checkpoint-indicator red" id="tut-step5-chk"
+                >❌ WAITING FOR PLASMA SWEEP ACTIVATION</span
+              >
+            </div>
+          </div>
+
+          <div id="tutorial-step-success" class="tutorial-step-pane hidden">
+            <div class="tut-success-badge">🏆 ACADEMY GRADUATE</div>
+            <h4>CALIBRATION COMPLETE</h4>
+            <p>
+              Spectacular flight maneuvering! You have calibrated your
+              navigation deck and are certified for Wiltshire orbital missions.
+            </p>
+            <p>
+              We've awarded your pilot link profile with
+              <strong>+250 Flight XP</strong>. Use your training to attempt Hard
+              difficulty targets like the Tesseract Frame or Eye of Ra!
+            </p>
+            <div class="modal-actions">
+              <button id="btn-tutorial-finish" class="modal-primary-btn">
+                ENGAGE CLOAK & ENTER ORBIT
+              </button>
+            </div>
+          </div>
+
+          <div class="modal-actions" id="tutorial-nav-actions">
+            <button id="btn-tut-prev" class="modal-secondary-btn hidden">
+              PREVIOUS
+            </button>
+            <button id="btn-tut-next" class="modal-primary-btn">
+              NEXT SYSTEM
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL: MISSION CONTROL / STARTUP SCREEN -->
+    <div id="mission-selector-modal" class="modal-overlay hidden">
+      <div class="modal-box mission-selector-box">
+        <div class="modal-header">
+          <span class="modal-title">👾 STEALTH ORBITAL MISSION CONTROL</span>
+          <button
+            class="modal-close-btn"
+            id="btn-close-missions"
+          >
+            &times;
+          </button>
+        </div>
+        <div class="modal-panel-content">
+          <p class="modal-intro">
+            Configure your stealth orbital crop engraver and select your target
+            coordinates. High-accuracy calibration reduces human detection risk!
+          </p>
+
+          <div
+            class="mission-pilot-settings"
+            style="
+              margin-bottom: 12px;
+              border-bottom: 1px solid rgba(0, 255, 204, 0.1);
+              padding-bottom: 12px;
+            "
+          >
+            <div class="modal-input-group">
+              <label style="font-size: 8px; color: #5d8179; font-weight: bold"
+                >👽 CODENAME / PILOT IDENTITY</label
+              >
+              <input
+                type="text"
+                id="mission-pilot-name"
+                placeholder="e.g. Zorg"
+                maxlength="12"
+                value="ZORG"
+                style="
+                  width: 100%;
+                  background: rgba(0, 255, 204, 0.05);
+                  border: 1px solid rgba(0, 255, 204, 0.25);
+                  color: #00ffcc;
+                  padding: 6px;
+                  border-radius: 4px;
+                  box-sizing: border-box;
+                  outline: none;
+                  margin-top: 4px;
+                  font-weight: bold;
+                  letter-spacing: 1px;
+                "
+              />
+            </div>
+          </div>
+
+          <h4
+            style="
+              color: #00ffcc;
+              text-shadow: 0 0 4px rgba(0, 255, 204, 0.4);
+              margin: 5px 0 10px 0;
+              font-size: 11px;
+              letter-spacing: 1px;
+              text-transform: uppercase;
+            "
+          >
+            🛸 Target Sectors & Spaceship Complexity
+          </h4>
+
+          <div class="mission-cards-grid" id="mission-cards-grid">
+            <!-- Dynamically populated card elements by JS -->
+          </div>
+
+          <div class="modal-actions" style="margin-top: 15px">
+            <button
+              id="btn-engage-mission"
+              class="modal-primary-btn"
+              style="
+                width: 100%;
+                padding: 10px;
+                font-weight: bold;
+                letter-spacing: 1px;
+              "
+            >
+              🚀 ENGAGE ORBITAL INSCRIBER
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL: NON-BLOCKING TELEMETRY ALERT -->
+    <div
+      id="telemetry-alert-overlay"
+      class="modal-overlay hidden"
+      style="background: rgba(1, 4, 3, 0.7); z-index: 9999"
+    >
+      <div
+        class="modal-box"
+        style="
+          border-color: #ff3366;
+          box-shadow: 0 0 25px rgba(255, 51, 102, 0.35);
+          max-width: 380px;
+        "
+      >
+        <div
+          class="modal-header"
+          style="
+            border-bottom: 1px solid rgba(255, 51, 102, 0.2);
+            justify-content: space-between;
+            display: flex;
+            align-items: center;
+          "
+        >
+          <span
+            class="modal-title"
+            style="
+              color: #ff3366;
+              text-shadow: 0 0 4px rgba(255, 51, 102, 0.5);
+              font-size: 10px;
+            "
+            >⚠️ UPLINK TIMEOUT WARNING</span
+          >
+          <button
+            class="modal-close-btn"
+            id="btn-close-telemetry-alert"
+            style="
+              border: none;
+              background: transparent;
+              color: #ff3366;
+              font-size: 14px;
+              cursor: pointer;
+            "
+          >
+            &times;
+          </button>
+        </div>
+        <div class="modal-panel-content" style="padding-top: 10px">
+          <p
+            style="
+              color: #ff8ca3;
+              font-size: 10px;
+              line-height: 1.4;
+              margin-bottom: 12px;
+              text-shadow: none;
+            "
+          >
+            <strong>📡 TELEMETRY SERVER UNRESPONSIVE:</strong> The Quantum
+            Telemetry Uplink to Mother-ship Kepler-186f failed to establish a
+            secure handshake.
+          </p>
+          <p
+            style="
+              color: #79a199;
+              font-size: 9px;
+              line-height: 1.4;
+              margin-bottom: 15px;
+              text-shadow: none;
+            "
+          >
+            <strong>Potential Causes:</strong> Solar flare activity, active
+            local terrestrial proxy firewalls, or ionospheric distortion in the
+            Wiltshire sector.
+          </p>
+          <p
+            style="
+              color: #00ffcc;
+              font-size: 9.5px;
+              line-height: 1.4;
+              margin-bottom: 15px;
+              font-weight: bold;
+              border-left: 2px solid #00ffcc;
+              padding-left: 8px;
+              text-shadow: 0 0 2px rgba(0, 255, 204, 0.3);
+            "
+          >
+            Your local flight score was successfully cached! You can ignore this
+            telemetry packet warning and proceed with offline flight logging.
+          </p>
+          <div style="display: flex; gap: 8px">
+            <button
+              id="btn-telemetry-ignore"
+              class="modal-primary-btn"
+              style="
+                flex: 1;
+                font-weight: bold;
+                background: rgba(0, 255, 204, 0.15);
+                border-color: #00ffcc;
+                padding: 6px 0;
+                font-size: 10px;
+              "
+            >
+              👽 IGNORE & PLAY
+            </button>
+            <button
+              id="btn-telemetry-retry"
+              class="modal-secondary-btn"
+              style="
+                flex: 1;
+                font-weight: bold;
+                border-color: #ff3366;
+                color: #ff3366;
+                padding: 6px 0;
+                font-size: 10px;
+                background: transparent;
+              "
+            >
+              🔄 RETRY SYNC
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>

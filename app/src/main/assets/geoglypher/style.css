@@ -1,0 +1,3117 @@
+/* ==========================================
+   GEOGLYPHER SPECIAL ALIEN HUD STYLE SHEETS
+   ========================================== */
+
+/* Color Variables */
+:root {
+  --bg-darker: #121115;
+  --bg-dark: #1c1b1f;
+  --bg-panel: #26242a;
+  --border-neon: #d0bcff;
+  --border-target: #00f0ff;
+  --text-primary: #e6e1e5;
+  --text-neon: #d0bcff;
+  --text-target: #00f0ff;
+  --glow-green: 0 0 8px rgba(208, 188, 255, 0.6);
+  --glow-cyan: 0 0 8px rgba(0, 240, 255, 0.6);
+  --glow-red: 0 0 8px rgba(255, 68, 68, 0.6);
+
+  /* Lavender Theme Constants */
+  --text-lavender: #d0bcff;
+  --border-lavender: #d0bcff;
+  --bg-purple-dark: #2b2930;
+  --bg-purple-deep: #1c1b1f;
+  --glow-lavender: 0 0 10px rgba(208, 188, 255, 0.7);
+}
+
+/* Base Styles & CRT Screen Simulation */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  user-select: none;
+}
+
+body,
+html {
+  width: 100%;
+  height: 100%;
+  background-color: var(--bg-darker);
+  font-family:
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    "Helvetica Neue",
+    Arial,
+    sans-serif;
+  color: var(--text-primary);
+  overflow: hidden;
+}
+
+/* CRT Screen Effects */
+.crt-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(
+    circle,
+    rgba(18, 34, 31, 0) 60%,
+    rgba(5, 11, 10, 0.85) 100%
+  );
+  pointer-events: none;
+  z-index: 9999;
+}
+
+.scanlines {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
+  background-size: 100% 4px;
+  pointer-events: none;
+  z-index: 9998;
+}
+
+/* Main Layout: Spacecraft Cockpit Dashboard */
+.cockpit {
+  display: flex;
+  flex-direction: column;
+  width: 100vw;
+  height: 100vh;
+  padding: 8px;
+  background-color: var(--bg-darker);
+  border: 4px solid #223c38;
+}
+
+/* Header */
+.hud-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 12px;
+  background-color: var(--bg-panel);
+  border: 1px solid #1a332f;
+  margin-bottom: 8px;
+  border-radius: 4px;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+}
+
+.glowing-node {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background-color: var(--border-neon);
+  box-shadow:
+    var(--glow-green),
+    0 0 15px var(--border-neon);
+  margin-right: 12px;
+  animation: pulse-node 2s infinite alternate;
+}
+
+.system-title h1 {
+  font-size: 14px;
+  color: #fff;
+  letter-spacing: 2px;
+  font-weight: bold;
+}
+
+.sub-system {
+  font-size: 9px;
+  color: #558b81;
+}
+
+.header-right {
+  display: flex;
+  gap: 16px;
+}
+
+.status-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  font-size: 9px;
+  color: #558b81;
+}
+
+.status-stat .value {
+  font-size: 11px;
+  font-weight: bold;
+}
+
+/* Grid Dashboard Core */
+.hud-main {
+  display: grid;
+  grid-template-columns: 280px 1fr 340px;
+  gap: 8px;
+  flex: 1;
+  min-height: 0; /* Important for scroll */
+}
+
+/* Reusable Panels */
+.hud-panel {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--bg-panel);
+  border: 2px solid #1c3531;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 10px;
+  background-color: #0b1a18;
+  border-bottom: 1px solid #1c3531;
+  font-size: 11px;
+  font-weight: bold;
+}
+
+.panel-title {
+  color: #79a199;
+  letter-spacing: 1px;
+}
+
+.panel-badge {
+  background-color: #1a3c36;
+  padding: 2px 6px;
+  font-size: 9px;
+  border-radius: 3px;
+  color: var(--text-neon);
+}
+
+.panel-badge.green {
+  background-color: rgba(0, 255, 204, 0.15);
+  color: var(--text-neon);
+  box-shadow: 0 0 3px rgba(0, 255, 204, 0.3);
+}
+
+.panel-content {
+  flex: 1;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+/* Left Panel: Level Select & Reference Target */
+.level-selector {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.level-selector label {
+  font-size: 9px;
+  color: #79a199;
+}
+
+.level-selector select {
+  background-color: var(--bg-dark);
+  color: var(--text-neon);
+  border: 1px solid #204640;
+  padding: 6px;
+  font-family: inherit;
+  font-size: 11px;
+  border-radius: 4px;
+  outline: none;
+  cursor: pointer;
+  width: 100%;
+}
+
+.level-selector select:focus {
+  border-color: var(--border-neon);
+}
+
+.glyph-info-card {
+  background-color: rgba(5, 11, 10, 0.5);
+  border: 1px solid #1c3531;
+  border-radius: 4px;
+  padding: 8px;
+  margin-bottom: 10px;
+}
+
+.glyph-info-card h3 {
+  font-size: 13px;
+  color: #fff;
+  margin-bottom: 2px;
+}
+
+.difficulty-tag {
+  display: inline-block;
+  font-size: 9px;
+  font-weight: bold;
+  padding: 1px 4px;
+  border-radius: 3px;
+  background-color: #ff9800;
+  color: #000;
+  margin-bottom: 6px;
+}
+
+.difficulty-tag.EASY {
+  background-color: #4caf50;
+}
+.difficulty-tag.MEDIUM {
+  background-color: #ff9800;
+}
+.difficulty-tag.HARD {
+  background-color: #f44336;
+  color: #fff;
+}
+
+.glyph-info-card p {
+  font-size: 10px;
+  color: #8fbab1;
+  line-height: 1.3;
+}
+
+.target-visualization {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #204640;
+  background-color: var(--bg-darker);
+  border-radius: 4px;
+  margin-bottom: 10px;
+}
+
+.viz-header {
+  background-color: #050b0a;
+  padding: 3px 6px;
+  font-size: 9px;
+  color: #558b81;
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid #152d29;
+}
+
+.viz-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+}
+
+#target-canvas {
+  background-color: #050e0c;
+  border: 1px solid #1c3531;
+  border-radius: 4px;
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.1) inset;
+}
+
+.viz-footer {
+  background-color: #050b0a;
+  padding: 3px 6px;
+  font-size: 8px;
+  color: #79a199;
+  text-align: center;
+  border-top: 1px solid #152d29;
+}
+
+/* Leaderboards */
+.leaderboard-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.leaderboard-container {
+  flex: 1;
+  background-color: rgba(5, 11, 10, 0.5);
+  border: 1px solid #1c3531;
+  border-radius: 4px;
+  overflow-y: auto;
+}
+
+#leaderboard-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 9px;
+  text-align: left;
+}
+
+#leaderboard-table th {
+  background-color: #0b1a18;
+  color: #558b81;
+  padding: 4px 6px;
+  font-weight: bold;
+}
+
+#leaderboard-table td {
+  padding: 5px 6px;
+  border-bottom: 1px solid #142825;
+  color: #a3ccc4;
+}
+
+#leaderboard-table tr:hover {
+  background-color: rgba(0, 255, 204, 0.05);
+}
+
+#leaderboard-table td.rank-highlight {
+  color: var(--text-neon);
+  font-weight: bold;
+}
+
+/* Center Panel: Map and Spaceship Viewport */
+.hud-center {
+  background-color: #050e0c;
+  border-color: #224741;
+}
+
+.scanner-viewport {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0;
+  overflow: hidden;
+  position: relative;
+  background-color: #030807;
+}
+
+.scanner-container {
+  position: relative;
+  width: 500px;
+  height: 500px;
+  background-color: #000;
+  box-shadow: 0 0 30px rgba(0, 255, 204, 0.15) inset;
+  border: 2px solid #1d3e38;
+}
+
+#earth-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+#svg-drawing-plane {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  cursor: crosshair;
+}
+
+/* Radar Scan & Grid overlay styling */
+.grid-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-size: 50px 50px;
+  background-image:
+    linear-gradient(to right, rgba(0, 255, 204, 0.06) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 255, 204, 0.06) 1px, transparent 1px);
+  pointer-events: none;
+  z-index: 3;
+}
+
+.scanner-radar-swipe {
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: conic-gradient(
+    from 0deg at 50% 50%,
+    rgba(0, 255, 204, 0.08) 0deg,
+    rgba(0, 255, 204, 0.01) 90deg,
+    transparent 180deg
+  );
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 4;
+  animation: radar-sweep 8s linear infinite;
+}
+
+/* Alien Spaceship UFO Styling */
+.ufo-container {
+  position: absolute;
+  width: 50px;
+  height: 50px;
+  transform: translate(-50%, -50%); /* Center on coordinates */
+  pointer-events: none;
+  z-index: 10;
+  transition:
+    left 0.3s cubic-bezier(0.25, 1, 0.5, 1),
+    top 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.beam-light {
+  position: absolute;
+  top: 25px;
+  left: 10px;
+  width: 30px;
+  height: 120px;
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 255, 204, 0.6) 0%,
+    rgba(0, 255, 204, 0.1) 60%,
+    transparent 100%
+  );
+  clip-path: polygon(30% 0%, 70% 0%, 100% 100%, 0% 100%);
+  transform-origin: top center;
+  opacity: 0.15;
+  transition:
+    opacity 0.1s,
+    height 0.3s;
+  pointer-events: none;
+}
+
+/* Ship is firing beam state */
+.ufo-container.firing .beam-light {
+  opacity: 0.8;
+  height: 250px;
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 255, 204, 1) 0%,
+    rgba(0, 255, 204, 0.4) 50%,
+    transparent 100%
+  );
+  animation: laser-pulse 0.15s infinite alternate;
+}
+
+.saucer-core {
+  position: relative;
+  width: 50px;
+  height: 28px;
+  margin-top: 11px;
+}
+
+.stealth-hull {
+  position: absolute;
+  top: 6px;
+  left: 0;
+  width: 50px;
+  height: 16px;
+  background: radial-gradient(ellipse at center, #35504a 0%, #1a2a27 100%);
+  border: 1px solid #5d887f;
+  border-radius: 50% / 50%;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.6);
+}
+
+.cabin-lights {
+  position: absolute;
+  top: 0;
+  left: 14px;
+  width: 22px;
+  height: 12px;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(0, 240, 255, 0.8) 0%,
+    rgba(0, 150, 160, 0.4) 100%
+  );
+  border: 1px solid #7be8ff;
+  border-radius: 50% / 60%;
+  z-index: 2;
+  box-shadow: 0 0 5px rgba(0, 240, 255, 0.7);
+}
+
+.jet-thrusters {
+  position: absolute;
+  bottom: 3px;
+  left: 6px;
+  width: 38px;
+  height: 4px;
+  background: #00ffcc;
+  border-radius: 50%;
+  box-shadow:
+    0 0 6px #00ffcc,
+    0 0 12px #00ffcc;
+  animation: glow-oscillate 0.3s infinite alternate;
+}
+
+/* Right Panel: SVG Command Terminal and D-pad */
+.hud-right {
+  border-color: #2b4540;
+}
+
+.terminal-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  height: 100%;
+}
+
+.terminal-tabs {
+  display: flex;
+  background-color: var(--bg-dark);
+  border-radius: 4px;
+  padding: 2px;
+  border: 1px solid #1a332f;
+}
+
+.tab-btn {
+  flex: 1;
+  background: none;
+  border: none;
+  color: #558b81;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: bold;
+  padding: 6px;
+  cursor: pointer;
+  border-radius: 3px;
+  transition: all 0.2s;
+}
+
+.tab-btn.active {
+  background-color: #1a3c36;
+  color: var(--text-neon);
+  box-shadow: var(--glow-green);
+}
+
+.tab-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.tab-content.hidden {
+  display: none;
+}
+
+/* Plasma Code Editor */
+.terminal-editor-header {
+  font-size: 9px;
+  color: #558b81;
+  margin-bottom: 4px;
+}
+
+.editor-wrapper {
+  flex: 1;
+  background-color: var(--bg-darker);
+  border: 1px solid #204640;
+  border-radius: 4px;
+  padding: 8px;
+  display: flex;
+  font-family: inherit;
+  font-size: 12px;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.5) inset;
+}
+
+.terminal-prompt {
+  color: var(--text-neon);
+  font-weight: bold;
+  vertical-align: top;
+  margin-top: 1px;
+}
+
+.terminal-prompt-end {
+  color: var(--text-neon);
+  font-weight: bold;
+  vertical-align: bottom;
+}
+
+.svg-terminal-textarea {
+  flex: 1;
+  background: none;
+  border: none;
+  color: #fff;
+  font-family: inherit;
+  font-size: 13px;
+  resize: none;
+  outline: none;
+  line-height: 1.4;
+  height: 100%;
+}
+
+.syntax-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 6px;
+}
+
+.syntax-label {
+  font-size: 8px;
+  color: #558b81;
+}
+
+.syntax-buttons {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+}
+
+.syntax-btn {
+  background-color: #0b1a18;
+  border: 1px solid #1c3531;
+  color: #8fbab1;
+  font-family: inherit;
+  font-size: 9px;
+  padding: 4px 2px;
+  border-radius: 3px;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.15s;
+}
+
+.syntax-btn:hover {
+  background-color: #1c3d37;
+  color: #fff;
+  border-color: var(--border-neon);
+}
+
+/* Autopilot / Flying steering wheels */
+.pilot-instructions {
+  font-size: 9px;
+  color: #79a199;
+  line-height: 1.3;
+  margin-bottom: 12px;
+  background-color: rgba(0, 240, 255, 0.04);
+  padding: 6px;
+  border-left: 2px solid var(--border-target);
+  border-radius: 2px;
+}
+
+.ufo-joystick-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+}
+
+.joystick-ring {
+  position: relative;
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  border: 2px solid #204640;
+  background-color: var(--bg-darker);
+  box-shadow: 0 0 10px rgba(0, 255, 204, 0.1) inset;
+}
+
+.joy-btn {
+  position: absolute;
+  width: 32px;
+  height: 32px;
+  background-color: #122824;
+  border: 1px solid #28544d;
+  color: var(--text-neon);
+  font-size: 11px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+}
+
+.joy-btn:hover {
+  background-color: var(--border-neon);
+  color: #000;
+  box-shadow: var(--glow-green);
+  border-color: #fff;
+}
+
+.joy-btn:active {
+  transform: scale(0.9);
+}
+
+/* Joystick Positioning */
+.dir-n {
+  top: 5px;
+  left: 54px;
+}
+.dir-ne {
+  top: 20px;
+  right: 18px;
+  font-size: 8px !important;
+}
+.dir-e {
+  top: 54px;
+  right: 5px;
+}
+.dir-se {
+  bottom: 20px;
+  right: 18px;
+  font-size: 8px !important;
+}
+.dir-s {
+  bottom: 5px;
+  left: 54px;
+}
+.dir-sw {
+  bottom: 20px;
+  left: 18px;
+  font-size: 8px !important;
+}
+.dir-w {
+  top: 54px;
+  left: 5px;
+}
+.dir-nw {
+  top: 20px;
+  left: 18px;
+  font-size: 8px !important;
+}
+
+.joy-center {
+  position: absolute;
+  top: 48px;
+  left: 48px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background-color: #101c1a;
+  border: 2px dashed #30665d;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.thruster-core {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background-color: var(--border-neon);
+  box-shadow:
+    var(--glow-green),
+    0 0 10px var(--border-neon);
+}
+
+.pilot-configs {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.config-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: rgba(5, 11, 10, 0.6);
+  padding: 6px 10px;
+  border-radius: 4px;
+  border: 1px solid #1c3531;
+}
+
+.config-label {
+  font-size: 9px;
+  color: #558b81;
+  font-weight: bold;
+}
+
+.toggle-container {
+  display: flex;
+  gap: 4px;
+}
+
+.toggle-btn {
+  background-color: #081211;
+  border: 1px solid #1c3531;
+  color: #558b81;
+  font-family: inherit;
+  font-size: 8px;
+  font-weight: bold;
+  padding: 3px 6px;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.toggle-btn.active {
+  background-color: #14332d;
+  color: var(--text-neon);
+  border-color: var(--border-neon);
+  box-shadow: var(--glow-green);
+}
+
+.slider-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.slider-container input {
+  -webkit-appearance: none;
+  background: #142e2a;
+  height: 4px;
+  border-radius: 2px;
+  width: 100px;
+  outline: none;
+}
+
+.slider-container input::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--border-neon);
+  box-shadow: var(--glow-green);
+  cursor: pointer;
+}
+
+#step-value {
+  font-size: 10px;
+  font-weight: bold;
+  width: 32px;
+  text-align: right;
+}
+
+/* Actions Hub Panel (Beam Glyph & Reset) */
+.actions-hud-bar {
+  display: flex;
+  gap: 6px;
+  margin-top: auto;
+  border-top: 1px solid #1c3531;
+  padding-top: 8px;
+}
+
+.console-btn {
+  font-family: inherit;
+  font-size: 10px;
+  font-weight: bold;
+  padding: 10px 6px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.primary-action {
+  flex: 1.5;
+  background-color: #00ffcc;
+  border: 1px solid #fff;
+  color: #000;
+  letter-spacing: 1px;
+}
+
+.primary-action:hover {
+  background-color: #fff;
+  box-shadow:
+    var(--glow-green),
+    0 0 15px var(--border-neon);
+}
+
+.primary-action:active {
+  transform: scale(0.98);
+}
+
+.secondary-action {
+  flex: 1;
+  background-color: #0d1e1b;
+  border: 1px solid #204640;
+  color: #8fbab1;
+}
+
+.secondary-action:hover {
+  background-color: #1a3c36;
+  color: #fff;
+  border-color: var(--border-neon);
+}
+
+/* Coherence engine and Crew transmission dashboard (BOTTOM) */
+.hud-bottom {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 8px;
+  height: 120px;
+  margin-top: 8px;
+}
+
+.bottom-panel {
+  background-color: var(--bg-panel);
+  border: 2px solid #1c3531;
+  border-radius: 6px;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+/* Left Bottom: Coherence Circle Tracker */
+.coherence-panel {
+  border-color: #2b4540;
+}
+
+.coherence-header {
+  font-size: 9px;
+  color: #558b81;
+  font-weight: bold;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.coherence-body {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+}
+
+.coherence-circle-container {
+  position: relative;
+  width: 72px;
+  height: 72px;
+}
+
+.coherence-svg-ring {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.coherence-svg-ring circle {
+  fill: none;
+  stroke-width: 6;
+}
+
+.coherence-svg-ring .ring-bg {
+  stroke: #0a1413;
+}
+
+.coherence-svg-ring .ring-fg {
+  stroke: var(--border-neon);
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.coherence-percentage {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 13px;
+  font-weight: bold;
+  color: #fff;
+  text-shadow: var(--glow-green);
+}
+
+.coherence-stats {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 9px;
+}
+
+.stat-lbl {
+  color: #558b81;
+}
+
+.stat-val {
+  font-weight: bold;
+}
+
+/* Badge highlights */
+.badge-blue {
+  background-color: #01579b;
+  color: #fff;
+  padding: 1px 4px;
+  font-size: 8px;
+  border-radius: 3px;
+}
+
+.badge-green {
+  background-color: #1b5e20;
+  color: #fff;
+  padding: 1px 4px;
+  font-size: 8px;
+  border-radius: 3px;
+}
+
+/* Right Bottom: Crew transmission logs */
+.log-panel {
+  border-color: #2b4540;
+}
+
+.log-header {
+  font-size: 9px;
+  color: #558b81;
+  font-weight: bold;
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid #142825;
+  padding-bottom: 3px;
+  margin-bottom: 4px;
+}
+
+.log-freq {
+  color: #2e6259;
+}
+
+.log-console {
+  flex: 1;
+  background-color: #040908;
+  border: 1px solid #142a27;
+  border-radius: 4px;
+  padding: 4px 8px;
+  overflow-y: auto;
+  font-size: 10px;
+  line-height: 1.4;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.log-line {
+  word-break: break-word;
+}
+
+.text-system {
+  color: #558b81;
+}
+.text-alien {
+  color: #a3ccc4;
+}
+.text-error {
+  color: #f44336;
+  text-shadow: var(--glow-red);
+}
+.text-success {
+  color: var(--text-neon);
+  text-shadow: var(--glow-green);
+}
+
+.alien-name {
+  color: var(--text-neon);
+  font-weight: bold;
+}
+
+/* Score submission panel overlays */
+.log-input-area {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  background-color: #0b1e1a;
+  border: 1px solid var(--border-target);
+  box-shadow: var(--glow-cyan);
+  border-radius: 4px;
+  padding: 6px 12px;
+  gap: 12px;
+  animation: border-flicker 2s infinite alternate;
+}
+
+.input-prompt {
+  font-size: 10px;
+  font-weight: bold;
+  color: var(--text-target);
+}
+
+#pilot-codename-input {
+  flex: 1;
+  background-color: #050e0d;
+  border: 1px solid #1c4d44;
+  color: #fff;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: bold;
+  padding: 6px;
+  border-radius: 4px;
+  outline: none;
+  text-transform: uppercase;
+}
+
+#pilot-codename-input:focus {
+  border-color: var(--border-target);
+}
+
+.submit-score-btn {
+  background-color: var(--border-target);
+  color: #000;
+  border: none;
+  font-family: inherit;
+  font-size: 10px;
+  font-weight: bold;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.submit-score-btn:hover {
+  background-color: #fff;
+  box-shadow: var(--glow-cyan);
+}
+
+/* Colors helpers */
+.green-glow {
+  color: var(--text-neon);
+  text-shadow: var(--glow-green);
+}
+.cyan-glow {
+  color: var(--text-target);
+  text-shadow: var(--glow-cyan);
+}
+.red-glow {
+  color: #ff4444;
+  text-shadow: var(--glow-red);
+}
+
+/* Keyframe animations */
+@keyframes pulse-node {
+  from {
+    opacity: 0.5;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+}
+
+@keyframes radar-sweep {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes glow-oscillate {
+  from {
+    opacity: 0.7;
+    box-shadow: 0 0 4px #00ffcc;
+  }
+  to {
+    opacity: 1;
+    box-shadow:
+      0 0 10px #00ffcc,
+      0 0 15px #00ffcc;
+  }
+}
+
+@keyframes laser-pulse {
+  from {
+    opacity: 0.85;
+    transform: scaleX(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scaleX(1.1);
+  }
+}
+
+@keyframes border-flicker {
+  0% {
+    border-color: var(--border-target);
+    box-shadow: var(--glow-cyan);
+  }
+  4% {
+    border-color: rgba(0, 240, 255, 0.4);
+    box-shadow: none;
+  }
+  5% {
+    border-color: var(--border-target);
+    box-shadow: var(--glow-cyan);
+  }
+  80% {
+    border-color: var(--border-target);
+    box-shadow: var(--glow-cyan);
+  }
+  81% {
+    border-color: rgba(0, 240, 255, 0.2);
+    box-shadow: none;
+  }
+  83% {
+    border-color: var(--border-target);
+    box-shadow: var(--glow-cyan);
+  }
+  100% {
+    border-color: var(--border-target);
+    box-shadow: var(--glow-cyan);
+  }
+}
+
+.animate-pulse {
+  animation: pulse-node 1s infinite alternate;
+}
+
+/* Utilities */
+.text-white {
+  color: #fff;
+}
+
+/* Clickable HUD items */
+.clickable-hud {
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.clickable-hud:hover {
+  background-color: rgba(208, 188, 255, 0.15);
+  box-shadow: var(--glow-lavender);
+}
+.lavender-glow {
+  color: var(--text-lavender);
+  text-shadow: var(--glow-lavender);
+}
+
+/* Modals Overlay & Layout */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(18, 17, 21, 0.85);
+  backdrop-filter: blur(8px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.3s ease;
+}
+
+.modal-overlay.hidden {
+  display: none !important;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.modal-box {
+  width: 90%;
+  max-width: 500px;
+  background: linear-gradient(
+    135deg,
+    var(--bg-purple-dark),
+    var(--bg-purple-deep)
+  );
+  border: 2px solid var(--border-lavender);
+  border-radius: 16px;
+  box-shadow:
+    var(--glow-lavender),
+    0 8px 32px rgba(0, 0, 0, 0.5);
+  padding: 24px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(208, 188, 255, 0.3);
+  padding-bottom: 12px;
+}
+
+.modal-title {
+  font-size: 14px;
+  font-weight: bold;
+  letter-spacing: 2px;
+  color: var(--text-lavender);
+  text-shadow: var(--glow-lavender);
+}
+
+.modal-close-btn {
+  background: none;
+  border: none;
+  color: var(--text-lavender);
+  font-size: 24px;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.modal-close-btn:hover {
+  transform: scale(1.2);
+  color: #fff;
+}
+
+.modal-tabs {
+  display: flex;
+  gap: 8px;
+  border-bottom: 1px solid rgba(208, 188, 255, 0.1);
+}
+
+.modal-tab-btn {
+  flex: 1;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 10px;
+  font-weight: bold;
+  padding: 8px 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.modal-tab-btn.active {
+  color: var(--text-lavender);
+  border-bottom-color: var(--border-lavender);
+  text-shadow: var(--glow-lavender);
+}
+
+.modal-panel-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.modal-panel-content.hidden {
+  display: none !important;
+}
+
+.modal-intro {
+  font-size: 11px;
+  line-height: 1.5;
+  color: #cac4d0;
+}
+
+.modal-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.modal-input-group label {
+  font-size: 9px;
+  font-weight: bold;
+  color: var(--text-lavender);
+  letter-spacing: 1px;
+}
+
+.modal-input-group input,
+.modal-input-group select {
+  background-color: rgba(18, 17, 21, 0.6);
+  border: 1px solid rgba(208, 188, 255, 0.4);
+  border-radius: 8px;
+  color: #fff;
+  font-family: inherit;
+  font-size: 12px;
+  padding: 10px 12px;
+  outline: none;
+  transition: all 0.2s;
+}
+
+.modal-input-group input:focus,
+.modal-input-group select:focus {
+  border-color: var(--border-lavender);
+  box-shadow: var(--glow-lavender);
+}
+
+.modal-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.modal-primary-btn {
+  flex: 1;
+  background-color: var(--border-lavender);
+  color: #381e72;
+  border: none;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: bold;
+  padding: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  letter-spacing: 1px;
+}
+
+.modal-primary-btn:hover {
+  background-color: #fff;
+  box-shadow: var(--glow-lavender);
+  transform: translateY(-1px);
+}
+
+.modal-secondary-btn {
+  flex: 1;
+  background: none;
+  border: 1px solid var(--border-lavender);
+  color: var(--text-lavender);
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: bold;
+  padding: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.modal-secondary-btn:hover {
+  background-color: rgba(208, 188, 255, 0.1);
+  color: #fff;
+}
+
+/* Profile display */
+.profile-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background-color: rgba(18, 17, 21, 0.4);
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(208, 188, 255, 0.2);
+}
+
+.avatar-holder {
+  font-size: 32px;
+  background-color: rgba(208, 188, 255, 0.2);
+  width: 54px;
+  height: 54px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 1px solid var(--border-lavender);
+}
+
+.profile-details h4 {
+  font-size: 14px;
+  color: #fff;
+  letter-spacing: 1px;
+}
+
+.profile-details p {
+  font-size: 10px;
+  color: #cac4d0;
+}
+
+.pilot-history {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.pilot-history h5 {
+  font-size: 10px;
+  color: var(--text-lavender);
+  letter-spacing: 1px;
+}
+
+.history-list {
+  background-color: rgba(18, 17, 21, 0.5);
+  border: 1px solid rgba(208, 188, 255, 0.1);
+  border-radius: 8px;
+  padding: 10px;
+  max-height: 120px;
+  overflow-y: auto;
+  font-size: 10px;
+}
+
+.no-records {
+  color: #888;
+  text-align: center;
+  padding: 12px 0;
+}
+
+.history-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(208, 188, 255, 0.1);
+}
+
+.history-item:last-child {
+  border-bottom: none;
+}
+
+/* In-App Purchase */
+.iap-upgrade-container {
+  margin: 12px 0;
+}
+
+.iap-upgrade-btn {
+  width: 100%;
+  background: linear-gradient(135deg, #d0bcff, #6750a4);
+  color: #fff;
+  border: none;
+  padding: 10px;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: bold;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 4px 12px rgba(103, 80, 164, 0.4);
+}
+
+.iap-upgrade-btn:hover {
+  background: linear-gradient(135deg, #e8def8, #7f67be);
+  box-shadow: var(--glow-lavender);
+  transform: scale(1.02);
+}
+
+.iap-badge {
+  background-color: rgba(255, 180, 0, 0.15);
+  border: 1px solid #ffb400;
+  color: #ffb400;
+  font-size: 11px;
+  font-weight: bold;
+  text-align: center;
+  padding: 8px;
+  border-radius: 6px;
+}
+
+.billing-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background-color: rgba(18, 17, 21, 0.3);
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px solid rgba(208, 188, 255, 0.15);
+}
+
+.input-row-flex {
+  display: flex;
+  gap: 12px;
+}
+
+.half {
+  flex: 1;
+}
+
+/* Processing spinner */
+.processing-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(18, 17, 21, 0.9);
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  border-radius: 16px;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid rgba(208, 188, 255, 0.2);
+  border-top-color: var(--border-lavender);
+  border-radius: 50%;
+  animation: radar-sweep 1s linear infinite;
+}
+
+.processing-text {
+  font-size: 11px;
+  color: var(--text-lavender);
+  letter-spacing: 2px;
+  font-weight: bold;
+}
+
+/* Custom Logo Upload */
+.logo-upload-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background-color: rgba(0, 240, 255, 0.1);
+  border: 2px dashed var(--border-target);
+  border-radius: 8px;
+  padding: 12px;
+  color: var(--text-target);
+  font-size: 11px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+}
+
+.logo-upload-label:hover {
+  background-color: rgba(0, 240, 255, 0.2);
+  box-shadow: var(--glow-cyan);
+}
+
+.upload-icon {
+  font-size: 16px;
+}
+
+/* Flight Academy Tutorial Style */
+.tutorial-box {
+  max-width: 550px;
+}
+
+.tutorial-progress-bar {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.progress-step {
+  flex: 1;
+  height: 4px;
+  background-color: rgba(208, 188, 255, 0.2);
+  border-radius: 2px;
+  transition: all 0.3s;
+}
+
+.progress-step.active {
+  background-color: var(--border-lavender);
+  box-shadow: var(--glow-lavender);
+}
+
+.progress-step.completed {
+  background-color: #00ffcc;
+  box-shadow: var(--glow-green);
+}
+
+.tutorial-step-pane h4 {
+  font-size: 13px;
+  color: #fff;
+  letter-spacing: 1px;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  border-left: 3px solid var(--border-lavender);
+  padding-left: 8px;
+}
+
+.tutorial-step-pane p {
+  font-size: 11px;
+  line-height: 1.6;
+  color: #cac4d0;
+  margin-bottom: 12px;
+}
+
+.tut-hero {
+  font-size: 48px;
+  text-align: center;
+  margin-bottom: 16px;
+  animation: pulse-node 1.5s infinite alternate;
+}
+
+.hud-tour-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 10px;
+  color: #cac4d0;
+  margin-bottom: 16px;
+}
+
+.hud-tour-list li {
+  position: relative;
+  padding-left: 14px;
+}
+
+.hud-tour-list li::before {
+  content: "•";
+  position: absolute;
+  left: 0;
+  color: var(--text-lavender);
+}
+
+.interactive-instruction {
+  background-color: rgba(0, 240, 255, 0.1);
+  border: 1px solid var(--border-target);
+  color: #fff !important;
+  font-weight: bold;
+  padding: 10px;
+  border-radius: 6px;
+}
+
+.tutorial-interactive-box {
+  background-color: rgba(18, 17, 21, 0.6);
+  border: 1px solid rgba(208, 188, 255, 0.2);
+  border-radius: 8px;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 50px;
+}
+
+.checkpoint-indicator {
+  font-size: 10px;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+
+.checkpoint-indicator.red {
+  color: #ff4444;
+  text-shadow: var(--glow-red);
+}
+
+.checkpoint-indicator.green {
+  color: #00ffcc;
+  text-shadow: var(--glow-green);
+}
+
+.syntax-guide-table {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background-color: rgba(18, 17, 21, 0.4);
+  padding: 8px;
+  border-radius: 6px;
+  margin-bottom: 12px;
+}
+
+.syntax-guide-table div {
+  font-size: 9px;
+  color: #cac4d0;
+}
+
+.syntax-guide-table code {
+  color: var(--text-lavender);
+  font-weight: bold;
+}
+
+.tut-success-badge {
+  background-color: rgba(0, 255, 204, 0.15);
+  border: 1px solid #00ffcc;
+  color: #00ffcc;
+  text-shadow: var(--glow-green);
+  font-size: 12px;
+  font-weight: bold;
+  text-align: center;
+  padding: 8px;
+  border-radius: 6px;
+  margin-bottom: 16px;
+}
+
+.rank-highlight {
+  color: var(--text-lavender) !important;
+  text-shadow: var(--glow-lavender);
+  font-weight: bold;
+}
+
+/* ===================================================
+   STREAMLINED & OVERLAY-DRIVEN COCKPIT HUD STYLES
+   =================================================== */
+
+/* Completely hide legacy block-column containers */
+.hud-left,
+.hud-right,
+.hud-bottom,
+.actions-hud-bar,
+.leaderboard-section {
+  display: none !important;
+}
+
+body,
+html {
+  overflow: hidden !important;
+  background-color: #010403;
+  color: #e0f2f1;
+  font-family:
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    "Helvetica Neue",
+    Arial,
+    sans-serif;
+}
+
+/* Centralized cockpit container taking 100vh */
+.cockpit {
+  padding: 0;
+  margin: 0;
+  width: 100vw;
+  height: 100vh;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  background: radial-gradient(circle at center, #071f16 0%, #010503 100%);
+}
+
+/* Master Header system (Stealth cloak / system status stats) */
+.hud-header {
+  height: 40px;
+  background: rgba(1, 4, 3, 0.85);
+  backdrop-filter: blur(4px);
+  border-bottom: 1px solid rgba(0, 255, 204, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  box-sizing: border-box;
+  z-index: 1000;
+}
+
+/* Make main section fill the remaining height */
+.hud-main {
+  flex: 1;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  align-items: center !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  width: 100vw;
+  height: calc(100vh - 40px);
+  min-height: 0;
+  position: relative;
+}
+
+/* Central Scanner viewport */
+.hud-center {
+  background: none !important;
+  border: none !important;
+  border-radius: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+}
+
+.scanner-viewport {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Giant playable earth grid canvas scaling to screen height */
+.scanner-container {
+  width: min(calc(100vh - 50px), calc(100vw - 12px)) !important;
+  height: min(calc(100vh - 50px), calc(100vw - 12px)) !important;
+  max-width: 98vw !important;
+  max-height: 98vh !important;
+  aspect-ratio: 1 / 1 !important;
+  position: relative;
+  background-color: #020604;
+  border: 1.5px solid rgba(0, 255, 204, 0.5);
+  box-shadow: 0 0 30px rgba(0, 255, 204, 0.35);
+  border-radius: 8px;
+  overflow: hidden;
+  touch-action: none !important;
+}
+
+/* Scale background canvases and SVGs to fill the container perfectly */
+#earth-canvas {
+  width: 100% !important;
+  height: 100% !important;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+}
+
+#svg-drawing-plane {
+  width: 100% !important;
+  height: 100% !important;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 5;
+  touch-action: none !important;
+}
+
+/* Absolute Glassmorphic overlays sitting on the viewport */
+.top-control-overlay,
+.left-selector-overlay,
+.right-command-overlay,
+.coherence-hologram-overlay,
+.flight-panel-overlay,
+.transmission-drawer-overlay {
+  position: absolute;
+  z-index: 100;
+  background: rgba(3, 11, 8, 0.62);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(0, 255, 204, 0.18);
+  border-radius: 6px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.7);
+  box-sizing: border-box;
+  pointer-events: none; /* Let drag draws pass through blank areas */
+  transition: all 0.3s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.top-control-overlay *,
+.left-selector-overlay *,
+.right-command-overlay *,
+.coherence-hologram-overlay *,
+.flight-panel-overlay *,
+.transmission-drawer-overlay * {
+  pointer-events: auto; /* Buttons and controls remain fully interactive */
+}
+
+/* A. TOP MENU OVERLAY (Pilot control menus on top) */
+.top-control-overlay {
+  top: 8px;
+  left: 8px;
+  right: 8px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 10px;
+}
+
+.top-overlay-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.neon-select-minimal {
+  background: rgba(0, 255, 204, 0.05);
+  color: #00ffcc;
+  border: 1px solid rgba(0, 255, 204, 0.3);
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: bold;
+  padding: 4px 22px 4px 6px;
+  border-radius: 4px;
+  outline: none;
+  cursor: pointer;
+  text-shadow: 0 0 2px rgba(0, 255, 204, 0.5);
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.level-select-glow {
+  position: relative;
+}
+
+.level-select-glow::after {
+  content: "▼";
+  font-size: 8px;
+  color: #00ffcc;
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.current-glyph-hud {
+  display: flex;
+  flex-direction: column;
+}
+
+#glyph-name {
+  font-size: 11px;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+}
+
+.difficulty-tag-minimal {
+  font-size: 8px;
+  font-weight: bold;
+  color: #ff9800;
+  text-shadow: 0 0 4px rgba(255, 152, 0, 0.5);
+  letter-spacing: 1px;
+}
+
+.top-overlay-center {
+  display: flex;
+  justify-content: center;
+}
+
+.hud-status-badge {
+  font-size: 9px;
+  font-weight: bold;
+  letter-spacing: 1px;
+  color: #00ffcc;
+  background: rgba(0, 255, 204, 0.1);
+  padding: 4px 10px;
+  border-radius: 3px;
+  border: 1px solid rgba(0, 255, 204, 0.25);
+  text-shadow: var(--glow-green);
+}
+
+.top-overlay-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Translucent Action Glyphs */
+.glyph-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 4px;
+  background: rgba(0, 255, 204, 0.05);
+  border: 1px solid rgba(0, 255, 204, 0.25);
+  color: #00ffcc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 0;
+}
+
+.glyph-btn:hover {
+  background: rgba(0, 255, 204, 0.2);
+  border-color: #00ffcc;
+  box-shadow: 0 0 10px rgba(0, 255, 204, 0.4);
+}
+
+.glyph-svg {
+  width: 16px;
+  height: 16px;
+  color: inherit;
+  fill: none;
+}
+
+.glyph-svg-filled {
+  width: 16px;
+  height: 16px;
+  color: inherit;
+}
+
+.abort-btn:hover {
+  background: rgba(255, 51, 102, 0.12);
+  border-color: #ff3366;
+  color: #ff3366;
+  box-shadow: 0 0 10px rgba(255, 51, 102, 0.4);
+}
+
+.fire-beam-btn {
+  background: rgba(0, 255, 204, 0.2);
+  border: 1px solid #00ffcc;
+  box-shadow: 0 0 8px rgba(0, 255, 204, 0.3);
+  animation: pulse-node 1.5s infinite alternate;
+}
+
+.fire-beam-btn:hover {
+  background: #00ffcc;
+  color: #010403;
+  box-shadow: 0 0 18px #00ffcc;
+}
+
+/* B. LEFT TOOL SELECTORS (Vertical tool belt) */
+.left-selector-overlay {
+  left: 8px;
+  top: 64px;
+  bottom: 8px;
+  width: 44px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 0;
+}
+
+.tool-glyph-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 4px;
+  border: 1px solid rgba(0, 255, 204, 0.2);
+  background: rgba(0, 255, 204, 0.02);
+  color: rgba(0, 255, 204, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 0;
+}
+
+.tool-glyph-btn:hover,
+.tool-glyph-btn.active {
+  color: #00ffcc;
+  border-color: #00ffcc;
+  background: rgba(0, 255, 204, 0.15);
+  box-shadow: 0 0 8px rgba(0, 255, 204, 0.3);
+}
+
+/* C. RIGHT WAYPOINTS DECK OVERLAY */
+.right-command-overlay {
+  right: 8px;
+  top: 64px;
+  bottom: 8px;
+  width: 175px;
+  display: flex;
+  flex-direction: column;
+  padding: 8px;
+}
+
+.overlay-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(0, 255, 204, 0.15);
+  padding-bottom: 4px;
+}
+
+.panel-title {
+  font-size: 10px;
+  font-weight: bold;
+  color: #79a199;
+  letter-spacing: 0.5px;
+}
+
+.compiler-toggle-btn {
+  background: rgba(0, 255, 204, 0.1);
+  border: 1px solid rgba(0, 255, 204, 0.3);
+  color: #00ffcc;
+  font-family: inherit;
+  font-size: 8px;
+  font-weight: bold;
+  padding: 2px 4px;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.compiler-toggle-btn:hover {
+  background: rgba(0, 255, 204, 0.25);
+  box-shadow: 0 0 4px #00ffcc;
+}
+
+.overlay-list-view {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+/* Scroller for Waypoints list */
+.steps-scroll-container {
+  flex: 1;
+  overflow-y: auto;
+  margin-top: 6px;
+  padding-right: 2px;
+}
+
+/* Sleek scrollbar styling for overlays */
+.steps-scroll-container::-webkit-scrollbar,
+.log-console-mini::-webkit-scrollbar {
+  width: 3px;
+}
+
+.steps-scroll-container::-webkit-scrollbar-track,
+.log-console-mini::-webkit-scrollbar-track {
+  background: rgba(0, 255, 204, 0.02);
+}
+
+.steps-scroll-container::-webkit-scrollbar-thumb,
+.log-console-mini::-webkit-scrollbar-thumb {
+  background: rgba(0, 255, 204, 0.2);
+  border-radius: 2px;
+}
+
+/* Tiny Compact Vector Input Cards */
+.step-card {
+  background: rgba(1, 4, 3, 0.6);
+  border: 1px solid rgba(0, 255, 204, 0.15);
+  border-radius: 4px;
+  padding: 4px 6px;
+  margin-bottom: 5px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  transition: all 0.2s ease;
+}
+
+.step-card:hover {
+  border-color: rgba(0, 255, 204, 0.35);
+  background: rgba(1, 4, 3, 0.85);
+}
+
+.step-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 9px;
+  font-weight: bold;
+  color: #00ffcc;
+}
+
+.step-type-lbl {
+  letter-spacing: 0.5px;
+}
+
+.btn-delete-step {
+  background: none;
+  border: none;
+  color: rgba(255, 51, 102, 0.6);
+  cursor: pointer;
+  padding: 0 2px;
+  font-size: 10px;
+  font-weight: bold;
+}
+
+.btn-delete-step:hover {
+  color: #ff3366;
+  text-shadow: 0 0 4px #ff3366;
+}
+
+.step-inputs-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  align-items: center;
+  margin-top: 2px;
+}
+
+.step-input-group {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.step-input-group label {
+  font-size: 8px;
+  color: #5d8179;
+}
+
+.step-num-input {
+  background: rgba(0, 255, 204, 0.05);
+  border: 1px solid rgba(0, 255, 204, 0.25);
+  color: #fff;
+  font-family: inherit;
+  font-size: 8px;
+  width: 26px;
+  padding: 1px 2px;
+  text-align: center;
+  border-radius: 2px;
+  outline: none;
+}
+
+.step-num-input:focus {
+  border-color: #00ffcc;
+}
+
+/* Raw Code view */
+.raw-editor-header {
+  font-size: 9px;
+  color: #79a199;
+  letter-spacing: 0.5px;
+  margin: 6px 0 2px 0;
+  font-weight: bold;
+}
+
+.editor-wrapper-minimal {
+  display: flex;
+  align-items: stretch;
+  background: rgba(1, 4, 3, 0.7);
+  border: 1px solid rgba(0, 255, 204, 0.2);
+  border-radius: 4px;
+  padding: 4px;
+  flex: 1;
+  min-height: 80px;
+}
+
+.prompt-char {
+  color: #5d8179;
+  font-size: 10px;
+  align-self: flex-start;
+}
+
+.svg-minimal-textarea {
+  background: transparent;
+  border: none;
+  color: #00ffcc;
+  font-family: "Courier New", Courier, monospace;
+  font-size: 10px;
+  resize: none;
+  flex: 1;
+  outline: none;
+  padding: 0 2px;
+  text-shadow: 0 0 2px rgba(0, 255, 204, 0.3);
+}
+
+.syntax-bar-minimal {
+  display: flex;
+  gap: 3px;
+  margin-top: 4px;
+  justify-content: space-between;
+}
+
+.syntax-btn-mini {
+  flex: 1;
+  background: rgba(0, 255, 204, 0.05);
+  border: 1px solid rgba(0, 255, 204, 0.2);
+  color: rgba(0, 255, 204, 0.7);
+  font-family: inherit;
+  font-size: 8px;
+  font-weight: bold;
+  padding: 2px 0;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.syntax-btn-mini:hover {
+  background: rgba(0, 255, 204, 0.2);
+  color: #00ffcc;
+  border-color: #00ffcc;
+}
+
+/* D. COHERENCE & HOLOGRAM OVERLAY (Bottom-Left Deck) */
+.coherence-hologram-overlay {
+  left: 60px;
+  bottom: 8px;
+  width: 175px;
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+}
+
+.coherence-sub-title {
+  font-size: 8px;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+  color: #79a199;
+  border-bottom: 1px solid rgba(0, 255, 204, 0.15);
+  padding-bottom: 2px;
+  margin-bottom: 4px;
+}
+
+.coherence-grid-deck {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 6px;
+}
+
+.hologram-preview-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#target-canvas {
+  width: 48px !important;
+  height: 48px !important;
+  border-radius: 4px;
+  border: 1px solid rgba(0, 255, 204, 0.3);
+  box-shadow: 0 0 6px rgba(0, 255, 204, 0.2);
+  background: #020705;
+}
+
+.canvas-lbl {
+  font-size: 6px;
+  color: #5d8179;
+  margin-top: 2px;
+  letter-spacing: 0.2px;
+}
+
+.coherence-mini-ring {
+  width: 48px;
+  height: 48px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.coherence-mini-ring .coherence-svg-ring {
+  width: 44px;
+  height: 44px;
+}
+
+.coherence-mini-ring .coherence-percentage {
+  font-size: 8px;
+  text-shadow: 0 0 2px rgba(0, 255, 204, 0.6);
+}
+
+.coherence-lbl {
+  font-size: 6px;
+  color: #5d8179;
+  margin-top: 2px;
+}
+
+.coherence-text-stats {
+  margin-top: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  border-top: 1px solid rgba(0, 255, 204, 0.1);
+  padding-top: 4px;
+}
+
+.mini-stat-line {
+  display: flex;
+  justify-content: space-between;
+  font-size: 7.5px;
+}
+
+.mini-stat-line .lbl {
+  color: #5d8179;
+}
+
+.mini-stat-line .val {
+  font-weight: bold;
+}
+
+/* Branded Custom Logo uploads */
+.iap-upgrade-container-minimal {
+  margin-top: 4px;
+  border-top: 1px dashed rgba(0, 255, 204, 0.15);
+  padding-top: 4px;
+}
+
+.iap-minimal-btn {
+  width: 100%;
+  background: linear-gradient(
+    135deg,
+    rgba(103, 80, 164, 0.2),
+    rgba(0, 255, 204, 0.1)
+  );
+  border: 1px solid rgba(0, 255, 204, 0.25);
+  color: #00ffcc;
+  font-family: inherit;
+  font-size: 7px;
+  font-weight: bold;
+  padding: 2px 4px;
+  border-radius: 3px;
+  cursor: pointer;
+  letter-spacing: 0.2px;
+  transition: all 0.2s ease;
+}
+
+.iap-minimal-btn:hover {
+  background: rgba(0, 255, 204, 0.2);
+  box-shadow: 0 0 6px rgba(0, 255, 204, 0.3);
+}
+
+.logo-upload-label-minimal {
+  display: block;
+  text-align: center;
+  border: 1px dashed #00ffcc;
+  color: #00ffcc;
+  background: rgba(0, 255, 204, 0.05);
+  font-size: 7px;
+  font-weight: bold;
+  padding: 2px;
+  border-radius: 2px;
+  cursor: pointer;
+  margin-top: 2px;
+}
+
+.logo-upload-label-minimal:hover {
+  background: rgba(0, 255, 204, 0.15);
+}
+
+/* E. FLIGHT CONTROL OVERLAY (Draggable Autopilot Menu) */
+.flight-panel-overlay {
+  bottom: 8px;
+  right: 190px;
+  width: 165px;
+  padding: 4px;
+}
+
+.flight-overlay-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 2px 4px;
+  border-bottom: 1px solid rgba(0, 255, 204, 0.12);
+}
+
+.flight-title {
+  font-size: 8px;
+  font-weight: bold;
+  color: #00ffcc;
+}
+
+.flight-toggle-btn {
+  background: rgba(0, 255, 204, 0.12);
+  border: 1px solid rgba(0, 255, 204, 0.25);
+  color: #00ffcc;
+  font-family: inherit;
+  font-size: 7px;
+  font-weight: bold;
+  padding: 1px 3px;
+  border-radius: 2px;
+  cursor: pointer;
+}
+
+.flight-toggle-btn:hover {
+  background: #00ffcc;
+  color: #000;
+}
+
+.flight-panel-overlay.minimized {
+  width: 90px !important;
+  height: 22px !important;
+  overflow: hidden;
+}
+
+.flight-panel-overlay.minimized .flight-overlay-header {
+  border: none !important;
+}
+
+.flight-overlay-content {
+  padding: 4px;
+}
+
+.ufo-joystick-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.joystick-ring {
+  width: 80px;
+  height: 80px;
+  border: 1px solid rgba(0, 255, 204, 0.25);
+}
+
+.joy-btn {
+  width: 22px;
+  height: 22px;
+  font-size: 9px;
+  border: 1px solid rgba(0, 255, 204, 0.15);
+}
+
+.joy-center {
+  width: 18px;
+  height: 18px;
+}
+
+.thruster-core {
+  width: 6px;
+  height: 6px;
+}
+
+.pilot-configs {
+  width: 100%;
+}
+
+.config-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 3px;
+}
+
+.config-label {
+  font-size: 7px;
+  color: #5d8179;
+}
+
+.toggle-container {
+  display: flex;
+  gap: 2px;
+}
+
+.toggle-btn {
+  font-size: 7px;
+  padding: 1px 3px;
+  border-radius: 2px;
+}
+
+.slider-container input[type="range"] {
+  width: 44px;
+  height: 2px;
+}
+
+#step-value {
+  font-size: 7px;
+}
+
+/* F. COLLAPSIBLE TRANSMISSION LOG DRAWER OVERLAY */
+.transmission-drawer-overlay {
+  bottom: 8px;
+  left: 242px;
+  width: 200px;
+  padding: 4px;
+}
+
+.drawer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  padding: 2px 4px;
+  font-size: 8px;
+  font-weight: bold;
+  color: #00ffcc;
+  text-shadow: 0 0 3px rgba(0, 255, 204, 0.4);
+}
+
+.transmission-drawer-overlay.minimized {
+  height: 22px !important;
+  overflow: hidden;
+}
+
+.drawer-subheader-tabs {
+  display: flex;
+  background: rgba(1, 4, 3, 0.4);
+  border-bottom: 1px solid rgba(0, 255, 204, 0.1);
+  margin-top: 2px;
+}
+
+.drawer-tab-btn {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: rgba(0, 255, 204, 0.5);
+  font-family: inherit;
+  font-size: 7.5px;
+  font-weight: bold;
+  padding: 4px 0;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+}
+
+.drawer-tab-btn:hover {
+  color: rgba(0, 255, 204, 0.8);
+}
+
+.drawer-tab-btn.active {
+  color: #00ffcc;
+  background: rgba(0, 255, 204, 0.08);
+  border-bottom: 1.5px solid #00ffcc;
+  text-shadow: 0 0 2px rgba(0, 255, 204, 0.5);
+}
+
+.drawer-content {
+  padding: 4px;
+}
+
+.log-console-mini {
+  background: rgba(1, 4, 3, 0.8);
+  border: 1px solid rgba(0, 255, 204, 0.15);
+  border-radius: 4px;
+  padding: 4px;
+  height: 64px;
+  overflow-y: auto;
+  font-size: 8px;
+  line-height: 1.2;
+}
+
+.log-line {
+  margin-bottom: 3px;
+}
+
+/* Leaderboard Table inside Mini Drawer */
+.leaderboard-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 7.5px;
+}
+
+.leaderboard-table tr {
+  border-bottom: 1px solid rgba(0, 255, 204, 0.05);
+}
+
+.leaderboard-table tr:last-child {
+  border-bottom: none;
+}
+
+.leaderboard-table td {
+  padding: 2.5px 2px;
+  text-align: left;
+}
+
+.leaderboard-table td:nth-child(2) {
+  text-align: center;
+  color: #79a199;
+}
+
+.leaderboard-table td:last-child {
+  text-align: right;
+  font-weight: bold;
+}
+
+.rank-highlight {
+  color: #ffb74d !important;
+  text-shadow: 0 0 3px rgba(255, 183, 77, 0.5);
+}
+
+.len-sub {
+  font-size: 6px;
+  color: #5d8179;
+  margin-left: 2px;
+}
+
+/* Floating Highscore codename submitter over map center when level complete */
+.log-input-area {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 200px;
+  background: rgba(3, 11, 8, 0.95);
+  border: 1px solid #00ffcc;
+  box-shadow: 0 0 20px rgba(0, 255, 204, 0.5);
+  z-index: 1000;
+  border-radius: 6px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* SPACESHIP DIFFICULTY VISUAL REPRESENTATIONS */
+.ufo-container.difficulty-easy {
+  width: 44px;
+  height: 44px;
+}
+.ufo-container.difficulty-easy .saucer-core {
+  width: 44px;
+  height: 24px;
+  margin-top: 10px;
+}
+.ufo-container.difficulty-easy .stealth-hull {
+  width: 44px;
+  height: 14px;
+}
+.ufo-container.difficulty-easy .cabin-lights {
+  width: 18px;
+  height: 10px;
+  left: 13px;
+}
+.ufo-container.difficulty-easy .jet-thrusters {
+  width: 32px;
+  height: 3px;
+  left: 6px;
+}
+
+.ufo-container.difficulty-medium {
+  width: 60px;
+  height: 60px;
+}
+.ufo-container.difficulty-medium .saucer-core {
+  width: 60px;
+  height: 32px;
+  margin-top: 14px;
+}
+.ufo-container.difficulty-medium .stealth-hull {
+  width: 60px;
+  height: 18px;
+  background: radial-gradient(ellipse at center, #4d6e66 0%, #1e3a34 100%);
+  border-color: #6eb5a7;
+}
+.ufo-container.difficulty-medium .cabin-lights {
+  width: 24px;
+  height: 12px;
+  left: 18px;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(0, 255, 204, 0.9) 0%,
+    rgba(0, 180, 150, 0.5) 100%
+  );
+}
+.ufo-container.difficulty-medium .jet-thrusters {
+  width: 48px;
+  height: 4px;
+  left: 6px;
+}
+.ufo-container.difficulty-medium .aux-hull-left {
+  display: block;
+  position: absolute;
+  left: -6px;
+  top: 10px;
+  width: 10px;
+  height: 10px;
+  background: #1e3a34;
+  border: 1px solid #00ffcc;
+  border-radius: 50%;
+  box-shadow: 0 0 6px rgba(0, 255, 204, 0.6);
+}
+.ufo-container.difficulty-medium .aux-hull-right {
+  display: block;
+  position: absolute;
+  right: -6px;
+  top: 10px;
+  width: 10px;
+  height: 10px;
+  background: #1e3a34;
+  border: 1px solid #00ffcc;
+  border-radius: 50%;
+  box-shadow: 0 0 6px rgba(0, 255, 204, 0.6);
+}
+
+.ufo-container.difficulty-hard {
+  width: 80px;
+  height: 80px;
+}
+.ufo-container.difficulty-hard .saucer-core {
+  width: 80px;
+  height: 44px;
+  margin-top: 18px;
+}
+.ufo-container.difficulty-hard .stealth-hull {
+  width: 80px;
+  height: 24px;
+  background: radial-gradient(ellipse at center, #6d3a8a 0%, #291238 100%);
+  border-color: #b16ff0;
+  border-radius: 30% / 50%;
+}
+.ufo-container.difficulty-hard .cabin-lights {
+  width: 32px;
+  height: 16px;
+  left: 24px;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(230, 0, 255, 0.9) 0%,
+    rgba(130, 0, 150, 0.5) 100%
+  );
+  border-color: #f7b3ff;
+  box-shadow: 0 0 10px rgba(230, 0, 255, 0.8);
+}
+.ufo-container.difficulty-hard .jet-thrusters {
+  width: 64px;
+  height: 6px;
+  left: 8px;
+  background: #ff00ff;
+  box-shadow:
+    0 0 10px #ff00ff,
+    0 0 20px #ff00ff;
+}
+.ufo-container.difficulty-hard .aux-hull-left {
+  display: block;
+  position: absolute;
+  left: -10px;
+  top: 14px;
+  width: 16px;
+  height: 16px;
+  background: #291238;
+  border: 1.5px solid #ff00ff;
+  border-radius: 40% 10% 40% 40%;
+  box-shadow: 0 0 8px rgba(255, 0, 255, 0.7);
+}
+.ufo-container.difficulty-hard .aux-hull-right {
+  display: block;
+  position: absolute;
+  right: -10px;
+  top: 14px;
+  width: 16px;
+  height: 16px;
+  background: #291238;
+  border: 1.5px solid #ff00ff;
+  border-radius: 10% 40% 40% 40%;
+  box-shadow: 0 0 8px rgba(255, 0, 255, 0.7);
+}
+.ufo-container.difficulty-hard .antenna-spire {
+  display: block;
+  position: absolute;
+  top: -12px;
+  left: 38px;
+  width: 4px;
+  height: 14px;
+  background: linear-gradient(to top, #ff00ff, #00ffcc);
+  box-shadow: 0 0 8px #00ffcc;
+}
+.ufo-container.difficulty-hard .solar-panels {
+  display: block;
+  position: absolute;
+  top: 18px;
+  left: 10px;
+  width: 60px;
+  height: 2px;
+  background: #00ffcc;
+  box-shadow: 0 0 5px #00ffcc;
+}
+
+.aux-hull-left,
+.aux-hull-right,
+.solar-panels,
+.antenna-spire {
+  display: none;
+}
+
+/* Dynamic glow animations */
+@keyframes pulse-node {
+  0% {
+    box-shadow: 0 0 4px rgba(0, 255, 204, 0.3);
+  }
+  100% {
+    box-shadow: 0 0 12px rgba(0, 255, 204, 0.6);
+  }
+}
+
+/* ===================================================
+   UNIFIED MISSION CONTROL SELECTOR & STARTUP STYLES
+   =================================================== */
+.mission-selector-box {
+  max-width: 530px !important;
+  width: 92vw !important;
+  border-color: #00ffcc !important;
+  box-shadow: 0 0 35px rgba(0, 255, 204, 0.4) !important;
+  background: rgba(2, 8, 6, 0.96) !important;
+  backdrop-filter: blur(12px) !important;
+}
+
+.mission-intro {
+  font-size: 10px;
+  color: #79a199;
+  line-height: 1.4;
+  margin-bottom: 12px;
+}
+
+.mission-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 8px;
+  margin-top: 5px;
+  max-height: 48vh;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+/* Custom scrollbar for cards grid */
+.mission-cards-grid::-webkit-scrollbar {
+  width: 4px;
+}
+.mission-cards-grid::-webkit-scrollbar-track {
+  background: rgba(0, 255, 204, 0.05);
+}
+.mission-cards-grid::-webkit-scrollbar-thumb {
+  background: rgba(0, 255, 204, 0.2);
+  border-radius: 2px;
+}
+
+.mission-card {
+  border: 1px solid rgba(0, 255, 204, 0.15);
+  background: rgba(1, 4, 3, 0.6);
+  border-radius: 6px;
+  padding: 8px;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.25s cubic-bezier(0.25, 1, 0.5, 1);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 165px;
+  justify-content: space-between;
+  box-sizing: border-box;
+}
+
+.mission-card:hover {
+  border-color: rgba(0, 255, 204, 0.45);
+  background: rgba(0, 255, 204, 0.04);
+  box-shadow: 0 0 8px rgba(0, 255, 204, 0.1);
+}
+
+.mission-card.active {
+  border-color: #00ffcc;
+  background: rgba(0, 255, 204, 0.08);
+  box-shadow:
+    0 0 15px rgba(0, 255, 204, 0.2) inset,
+    0 0 10px rgba(0, 255, 204, 0.15);
+}
+
+.ship-preview-box {
+  width: 100%;
+  height: 60px;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 6px;
+  background: radial-gradient(
+    circle at center,
+    rgba(0, 255, 204, 0.06) 0%,
+    transparent 70%
+  );
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+/* Force static alignment of preview spaceships inside mission selector cards */
+.mission-card .ufo-container {
+  position: absolute !important;
+  left: 50% !important;
+  top: 50% !important;
+  transform: translate(-50%, -50%) scale(0.65) !important;
+  margin: 0 !important;
+  pointer-events: none !important;
+  animation: none !important;
+  transition: none !important;
+}
+
+.mission-card-title {
+  font-size: 10.5px;
+  font-weight: bold;
+  color: #e0f2f1;
+  margin-top: 4px;
+  letter-spacing: 0.5px;
+  line-height: 1.2;
+}
+
+.mission-card-diff {
+  font-size: 8px;
+  font-weight: bold;
+  padding: 1px 6px;
+  border-radius: 10px;
+  margin: 4px 0;
+  letter-spacing: 0.5px;
+  display: inline-block;
+  text-transform: uppercase;
+}
+
+.mission-card-diff.easy {
+  background: rgba(0, 255, 204, 0.12);
+  color: #00ffcc;
+  border: 0.5px solid rgba(0, 255, 204, 0.3);
+}
+
+.mission-card-diff.medium {
+  background: rgba(0, 180, 255, 0.12);
+  color: #00b4ff;
+  border: 0.5px solid rgba(0, 180, 255, 0.3);
+}
+
+.mission-card-diff.hard {
+  background: rgba(230, 0, 255, 0.12);
+  color: #e600ff;
+  border: 0.5px solid rgba(230, 0, 255, 0.3);
+}
+
+.mission-card-desc {
+  font-size: 7.5px;
+  color: #79a199;
+  line-height: 1.3;
+  margin-top: 2px;
+  text-align: center;
+  flex-grow: 1;
+}
+
+/* Alien Glyph trigger button */
+.alien-glyph-trigger {
+  width: 32px;
+  height: 32px;
+  border-radius: 50% !important;
+  background: rgba(0, 255, 204, 0.08) !important;
+  border: 1.5px solid rgba(0, 255, 204, 0.45) !important;
+  box-shadow: 0 0 10px rgba(0, 255, 204, 0.15) !important;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.25s ease !important;
+  padding: 0 !important;
+}
+
+.alien-glyph-trigger:hover {
+  background: rgba(0, 255, 204, 0.2) !important;
+  border-color: #00ffcc !important;
+  box-shadow: 0 0 15px rgba(0, 255, 204, 0.45) !important;
+  transform: scale(1.08);
+}
