@@ -455,6 +455,30 @@ function setupLevelSelector() {
   selectGlyph.addEventListener("change", (e) => {
     loadGlyph(parseInt(e.target.value));
   });
+
+  // Direct click on difficulty badge cycles difficulty: EASY -> MEDIUM -> HARD -> EASY
+  if (textGlyphDifficulty) {
+    textGlyphDifficulty.style.cursor = "pointer";
+    textGlyphDifficulty.title = "Click to cycle target difficulty";
+    textGlyphDifficulty.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const diffOrder = ["EASY", "MEDIUM", "HARD"];
+      const currentDiff = GLYPHS[currentGlyphIndex] ? GLYPHS[currentGlyphIndex].difficulty : "EASY";
+      const nextDiffIndex = (diffOrder.indexOf(currentDiff) + 1) % diffOrder.length;
+      const targetDiff = diffOrder[nextDiffIndex];
+
+      // Find first glyph matching target difficulty
+      const newIndex = GLYPHS.findIndex((g) => g.difficulty === targetDiff);
+      if (newIndex !== -1) {
+        selectGlyph.value = newIndex;
+        loadGlyph(newIndex);
+        addLogLine(
+          `[DIFFICULTY] Switched target difficulty to ${targetDiff}: ${GLYPHS[newIndex].name}. Precision calibration updated.`,
+          "text-system"
+        );
+      }
+    });
+  }
 }
 
 function loadGlyph(index) {
@@ -466,12 +490,17 @@ function loadGlyph(index) {
       return;
   }
   
-  textGlyphName.textContent = glyph.name;
-  textGlyphDifficulty.textContent = glyph.difficulty;
-
-  // Style difficulty badge
-  textGlyphDifficulty.className = "difficulty-tag " + glyph.difficulty;
-  textGlyphDesc.textContent = glyph.description;
+  if (textGlyphName) {
+    textGlyphName.textContent = glyph.name;
+  }
+  if (textGlyphDifficulty) {
+    textGlyphDifficulty.textContent = glyph.difficulty;
+    // Style difficulty badge
+    textGlyphDifficulty.className = "difficulty-tag " + glyph.difficulty;
+  }
+  if (textGlyphDesc) {
+    textGlyphDesc.textContent = glyph.description;
+  }
 
   // Update UFO container size and complexity based on difficulty
   const ufoSaucer = document.getElementById("ufo-saucer");
@@ -1784,6 +1813,7 @@ function setupIAPSystem() {
     }
   });
 }
+}
 
 /* ===================================================
    FLIGHT ACADEMY INTERACTIVE ONBOARDING TUTORIAL
@@ -2473,6 +2503,64 @@ function setupCustomMissions() {
       card.addEventListener("touchstart", selectCard, { passive: true });
 
       missionCardsGrid.appendChild(card);
+    });
+  }
+
+  // Wire up difficulty filter tabs
+  const filterBtns = document.querySelectorAll(".diff-filter-btn");
+  filterBtns.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      filterBtns.forEach((b) => {
+        b.classList.remove("active");
+        b.style.background = "rgba(255, 255, 255, 0.03)";
+        b.style.borderColor = "rgba(255, 255, 255, 0.15)";
+        b.style.color = "#888";
+      });
+      btn.classList.add("active");
+      btn.style.background = "rgba(0, 255, 204, 0.15)";
+      btn.style.borderColor = "#00ffcc";
+      btn.style.color = "#00ffcc";
+
+      const diff = btn.getAttribute("data-diff");
+      const cards = document.querySelectorAll(".mission-card");
+      let firstVisibleIndex = -1;
+
+      cards.forEach((card) => {
+        const idx = parseInt(card.getAttribute("data-index"));
+        const glyph = GLYPHS[idx];
+        if (diff === "ALL" || glyph.difficulty === diff) {
+          card.style.display = "flex";
+          if (firstVisibleIndex === -1) {
+            firstVisibleIndex = idx;
+          }
+        } else {
+          card.style.display = "none";
+        }
+      });
+
+      // If current active card is hidden, select the first visible one
+      const currentSelectedCard = document.querySelector(".mission-card.active");
+      if (currentSelectedCard && currentSelectedCard.style.display === "none") {
+        if (firstVisibleIndex !== -1) {
+          cards.forEach((c) => c.classList.remove("active"));
+          const newActiveCard = document.querySelector(
+            `.mission-card[data-index="${firstVisibleIndex}"]`
+          );
+          if (newActiveCard) {
+            newActiveCard.classList.add("active");
+            selectedIndex = firstVisibleIndex;
+          }
+        }
+      }
+    });
+  });
+
+  // Open modal via top HUD click
+  const currentGlyphHUD = document.getElementById("hud-current-glyph");
+  if (currentGlyphHUD) {
+    currentGlyphHUD.addEventListener("click", () => {
+      if (btnCloseMissions) btnCloseMissions.style.display = "block";
+      if (missionModal) missionModal.classList.remove("hidden");
     });
   }
 

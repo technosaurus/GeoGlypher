@@ -158,8 +158,10 @@
                     </select>
                   </div>
                   <div
-                    class="current-glyph-hud"
-                    style="display: none !important"
+                    class="current-glyph-hud clickable-hud"
+                    id="hud-current-glyph"
+                    title="Select Target Mission & Difficulty (👽)"
+                    style="display: flex; flex-direction: column; cursor: pointer; padding: 4px 10px; background: rgba(0, 255, 204, 0.05); border: 1px solid rgba(0, 255, 204, 0.2); border-radius: 4px; transition: all 0.2s ease;"
                   >
                     <span id="glyph-name" class="cyan-glow"
                       >Roswell Propeller</span
@@ -1092,7 +1094,7 @@
             style="
               color: #00ffcc;
               text-shadow: 0 0 4px rgba(0, 255, 204, 0.4);
-              margin: 5px 0 10px 0;
+              margin: 5px 0 6px 0;
               font-size: 11px;
               letter-spacing: 1px;
               text-transform: uppercase;
@@ -1100,6 +1102,14 @@
           >
             🛸 Target Sectors & Spaceship Complexity
           </h4>
+
+          <!-- Difficulty filter tabs -->
+          <div class="difficulty-filters" style="display: flex; gap: 8px; margin-bottom: 12px; border-bottom: 1px solid rgba(0, 255, 204, 0.1); padding-bottom: 10px;">
+            <button class="diff-filter-btn active" data-diff="ALL" style="background: rgba(0, 255, 204, 0.15); border: 1px solid #00ffcc; color: #00ffcc; padding: 4px 10px; border-radius: 4px; font-size: 9px; font-weight: bold; cursor: pointer; letter-spacing: 0.5px; text-transform: uppercase; outline: none; transition: all 0.2s ease;">ALL</button>
+            <button class="diff-filter-btn" data-diff="EASY" style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.15); color: #888; padding: 4px 10px; border-radius: 4px; font-size: 9px; font-weight: bold; cursor: pointer; letter-spacing: 0.5px; text-transform: uppercase; outline: none; transition: all 0.2s ease;">EASY</button>
+            <button class="diff-filter-btn" data-diff="MEDIUM" style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.15); color: #888; padding: 4px 10px; border-radius: 4px; font-size: 9px; font-weight: bold; cursor: pointer; letter-spacing: 0.5px; text-transform: uppercase; outline: none; transition: all 0.2s ease;">MEDIUM</button>
+            <button class="diff-filter-btn" data-diff="HARD" style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.15); color: #888; padding: 4px 10px; border-radius: 4px; font-size: 9px; font-weight: bold; cursor: pointer; letter-spacing: 0.5px; text-transform: uppercase; outline: none; transition: all 0.2s ease;">HARD</button>
+          </div>
 
           <div class="mission-cards-grid" id="mission-cards-grid">
             <!-- Dynamically populated card elements by JS -->
