@@ -1,6 +1,8 @@
 {
-  "name": "GeoGlypher",
-  "description": "A spaceship crop-circle drawing game played by grey aliens using SVG path directives.",
+  "name": "Geoglypher",
+  "description": "Stealth Orbital Engraver & Geoglyph Tactical Scanner",
   "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
 }

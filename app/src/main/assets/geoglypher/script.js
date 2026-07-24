@@ -2,6 +2,23 @@
    GEOGLYPHER - GAMEPLAY ENGINE & COMPUTER VISION CORE
    =================================================== */
 
+// --- GLOBAL DEBUGGING & ERROR TRACKING ---
+window.addEventListener("error", (e) => {
+  const msg = `[SYSTEM ERROR] ${e.message || "Script Exception"} @ ${e.filename || "script.js"}:${e.lineno || 0}:${e.colno || 0}`;
+  console.error(msg, e.error);
+  if (typeof addLogLine === "function") {
+    addLogLine(msg, "text-danger");
+  }
+});
+
+window.addEventListener("unhandledrejection", (e) => {
+  const msg = `[UNHANDLED REJECTION] ${e.reason || "Promise rejection"}`;
+  console.error(msg, e.reason);
+  if (typeof addLogLine === "function") {
+    addLogLine(msg, "text-danger");
+  }
+});
+
 // --- GLYPH PATTERNS DATA ---
 const GLYPHS = [
   {
@@ -173,32 +190,42 @@ let transmissionLogConsole,
 
 // --- INITIALIZATION ---
 window.addEventListener("DOMContentLoaded", () => {
-  initializeDOMElements();
-  setupLevelSelector();
-  setupTerminalTabs();
-  setupSyntaxHelpers();
-  setupAutopilotControls();
-  setupActionButtons();
-  setupAuthSystem();
-  setupIAPSystem();
-  setupTutorialSystem();
-  loadLeaderboard();
+  console.log("[SYSTEM] DOMContentLoaded event fired. Commencing Geoglypher boot sequence...");
 
-  // Draw farmland satellite background
-  drawProceduralFarmland();
+  const initSteps = [
+    { name: "DOM Core References", fn: initializeDOMElements },
+    { name: "Level & Glyph Selector", fn: setupLevelSelector },
+    { name: "Terminal Tabs Navigation", fn: setupTerminalTabs },
+    { name: "Vector Syntax Helper Buttons", fn: setupSyntaxHelpers },
+    { name: "Ship Autopilot Controls", fn: setupAutopilotControls },
+    { name: "Scanner Action Buttons", fn: setupActionButtons },
+    { name: "Pilot Auth (Guest Mode)", fn: setupAuthSystem },
+    { name: "Galactic Branding & Logo Module", fn: setupIAPSystem },
+    { name: "Flight Academy Tutorial System", fn: setupTutorialSystem },
+    { name: "Orbital Leaderboard", fn: loadLeaderboard },
+    { name: "Farmland Satellite Canvas", fn: drawProceduralFarmland },
+    { name: "Initial Vector Glyph (Roswell)", fn: () => loadGlyph(0) },
+    { name: "Custom Missions Engine", fn: setupCustomMissions },
+    { name: "Telemetry Threat Radar Alerts", fn: setupTelemetryAlerts },
+    { name: "Direct Tactical Drawing Plane", fn: setupDirectDrawing },
+    { name: "Waypoint List Vector Builder", fn: setupWaypointBuilderEvents }
+  ];
 
-  // Load initial glyph
-  loadGlyph(0);
+  initSteps.forEach((step) => {
+    try {
+      step.fn();
+      console.log(`[INIT OK] ${step.name}`);
+    } catch (err) {
+      console.error(`[INIT WARN] Step '${step.name}' error:`, err);
+      if (typeof addLogLine === "function") {
+        addLogLine(`[INIT WARN] ${step.name} module warning: ${err.message}`, "text-danger");
+      }
+    }
+  });
 
-  // Setup custom mission selector and telemetry alerts
-  setupCustomMissions();
-  setupTelemetryAlerts();
-
-  // Setup direct drag-and-draw tracing interactions on the tactical scanner
-  setupDirectDrawing();
-
-  // Setup the interactive waypoint list controls
-  setupWaypointBuilderEvents();
+  if (typeof addLogLine === "function") {
+    addLogLine("[SYSTEM READY] Stealth Orbital Engraver initialized. Alien Pilot Zorg authenticated.", "text-success");
+  }
 });
 
 function setupDirectDrawing() {
@@ -1539,188 +1566,41 @@ function submitScoreToLeaderboard() {
    =================================================== */
 function setupAuthSystem() {
   authModal = document.getElementById("auth-modal");
-  btnCloseAuth = document.getElementById("btn-close-auth");
-  modalTabLogin = document.getElementById("modal-tab-login");
-  modalTabRegister = document.getElementById("modal-tab-register");
-  panelLogin = document.getElementById("panel-login");
-  panelRegister = document.getElementById("panel-register");
-  panelProfile = document.getElementById("panel-profile");
-
-  loginUsername = document.getElementById("login-username");
-  loginPassword = document.getElementById("login-password");
-  btnLoginSubmit = document.getElementById("btn-login-submit");
-
-  registerUsername = document.getElementById("register-username");
-  registerPassword = document.getElementById("register-password");
-  registerSpecies = document.getElementById("register-species");
-  btnRegisterSubmit = document.getElementById("btn-register-submit");
-
-  profileCodename = document.getElementById("profile-codename");
-  profileSpecies = document.getElementById("profile-species");
-  profileXp = document.getElementById("profile-xp");
-  profileHistoryList = document.getElementById("profile-history-list");
-  btnLogout = document.getElementById("btn-logout");
-
   hudPilotName = document.getElementById("hud-pilot-name");
   hudPilotAuth = document.getElementById("hud-pilot-auth");
 
-  if (hudPilotAuth) {
-    hudPilotAuth.addEventListener("click", () => {
-      authModal.classList.remove("hidden");
-      refreshProfileUI();
-    });
+  // Keep auth modal permanently hidden
+  if (authModal) {
+    authModal.classList.add("hidden");
+    authModal.style.display = "none";
   }
 
-  btnCloseAuth.addEventListener("click", () => {
-    authModal.classList.add("hidden");
-  });
+  // Automatically authenticate as alien Pilot ZORG without requiring login screen
+  currentPilot = {
+    username: "ZORG",
+    species: "Zeta Reticuli Grey",
+    xp: 2850,
+    history: []
+  };
 
-  modalTabLogin.addEventListener("click", () => {
-    modalTabLogin.classList.add("active");
-    modalTabRegister.classList.remove("active");
-    panelLogin.classList.remove("hidden");
-    panelRegister.classList.add("hidden");
-  });
+  if (hudPilotName) {
+    hudPilotName.textContent = "ZORG (AUTHENTICATED)";
+    hudPilotName.className = "value green-glow";
+  }
 
-  modalTabRegister.addEventListener("click", () => {
-    modalTabRegister.classList.add("active");
-    modalTabLogin.classList.remove("active");
-    panelRegister.classList.remove("hidden");
-    panelLogin.classList.add("hidden");
-  });
+  if (hudPilotAuth) {
+    hudPilotAuth.style.cursor = "default";
+  }
 
-  btnLoginSubmit.addEventListener("click", () => {
-    const user = loginUsername.value.trim().toUpperCase();
-    const pass = loginPassword.value.trim();
-    if (!user || !pass) {
-      alert("Please enter both Codename and Quantum Keypass.");
-      return;
-    }
-
-    const accounts = JSON.parse(
-      localStorage.getItem("geoglypher_accounts_v1") || "{}",
-    );
-    const found = accounts[user];
-    if (found && found.password === pass) {
-      currentPilot = found;
-      localStorage.setItem(
-        "geoglypher_active_pilot_v1",
-        JSON.stringify(currentPilot),
-      );
-      addLogLine(
-        `[SECURE] Synaptic link established. Welcome back, Pilot ${currentPilot.username}.`,
-        "text-success",
-      );
-      refreshProfileUI();
-      authModal.classList.add("hidden");
-    } else {
-      alert("Invalid Pilot Identifier or Security Keypass. Sync rejected.");
-    }
-  });
-
-  btnRegisterSubmit.addEventListener("click", () => {
-    const user = registerUsername.value.trim().toUpperCase();
-    const pass = registerPassword.value.trim();
-    const spec = registerSpecies.value;
-    if (!user || !pass) {
-      alert("Please enter a custom Codename and Keypass.");
-      return;
-    }
-
-    const accounts = JSON.parse(
-      localStorage.getItem("geoglypher_accounts_v1") || "{}",
-    );
-    if (accounts[user]) {
-      alert(
-        "This pilot identifier is already claimed in the Intergalactic Registry!",
-      );
-      return;
-    }
-
-    const newAcc = {
-      username: user,
-      password: pass,
-      species: spec,
-      xp: 0,
-      history: [],
-    };
-
-    accounts[user] = newAcc;
-    localStorage.setItem("geoglypher_accounts_v1", JSON.stringify(accounts));
-
-    currentPilot = newAcc;
-    localStorage.setItem(
-      "geoglypher_active_pilot_v1",
-      JSON.stringify(currentPilot),
-    );
-
-    addLogLine(
-      `[CLONE] Synthesized pilot profile. Identifier: ${user}. DNA Assignment: ${spec}.`,
-      "text-success",
-    );
-    refreshProfileUI();
-    authModal.classList.add("hidden");
-  });
-
-  btnLogout.addEventListener("click", () => {
-    addLogLine(
-      `[DISCONNECT] Severed pilot link for ${currentPilot.username}. Reverting to Guest.`,
-      "text-system",
-    );
-    currentPilot = null;
-    localStorage.removeItem("geoglypher_active_pilot_v1");
-    refreshProfileUI();
-    authModal.classList.add("hidden");
-  });
-
-  // Load active session from local storage
-  const activeSession = localStorage.getItem("geoglypher_active_pilot_v1");
-  if (activeSession) {
-    currentPilot = JSON.parse(activeSession);
-    addLogLine(
-      `[RESTORE] Synaptic link automatically re-connected: Pilot ${currentPilot.username}.`,
-      "text-success",
-    );
-    refreshProfileUI();
+  if (typeof addLogLine === "function") {
+    addLogLine("[AUTH] Direct neural authorization active. Pilot ZORG authenticated.", "text-success");
   }
 }
 
 function refreshProfileUI() {
-  if (currentPilot) {
-    hudPilotName.textContent = `${currentPilot.username} (${currentPilot.species.toUpperCase()})`;
+  if (hudPilotName) {
+    hudPilotName.textContent = "ZORG (AUTHENTICATED)";
     hudPilotName.className = "value green-glow";
-
-    panelLogin.classList.add("hidden");
-    panelRegister.classList.add("hidden");
-    modalTabLogin.classList.add("hidden");
-    modalTabRegister.classList.add("hidden");
-    panelProfile.classList.remove("hidden");
-
-    profileCodename.textContent = currentPilot.username;
-    profileSpecies.textContent = `Species: ${currentPilot.species}`;
-    profileXp.textContent = `Flight Training: ${currentPilot.xp} XP`;
-
-    profileHistoryList.innerHTML = "";
-    if (currentPilot.history && currentPilot.history.length > 0) {
-      currentPilot.history.forEach((item) => {
-        const div = document.createElement("div");
-        div.className = "history-item";
-        div.innerHTML = `<span>${item.glyph}</span><span class="green-glow">${item.score.toFixed(1)}%</span>`;
-        profileHistoryList.appendChild(div);
-      });
-    } else {
-      profileHistoryList.innerHTML = `<div class="no-records">No orbital glyphs transmitted yet.</div>`;
-    }
-  } else {
-    hudPilotName.textContent = "GUEST (OFFLINE)";
-    hudPilotName.className = "value lavender-glow";
-
-    panelLogin.classList.remove("hidden");
-    panelRegister.classList.add("hidden");
-    modalTabLogin.classList.remove("hidden");
-    modalTabRegister.classList.remove("hidden");
-    modalTabLogin.click();
-    panelProfile.classList.add("hidden");
   }
 }
 
@@ -1847,14 +1727,16 @@ function setupTutorialSystem() {
   btnTutNext.addEventListener("click", () => {
     if (activeTutorialStep < 5) {
       if (activeTutorialStep === 3 && !tutorialActionsDone.steered) {
-        alert(
-          "Pilot navigation lock active! Please select the 'SHIP AUTOPILOT' tab and press a directional joystick button to steer the ship first.",
+        addLogLine(
+          "[TUTORIAL] Pilot navigation lock active! Select 'SHIP AUTOPILOT' tab and press a directional joystick button to steer.",
+          "text-warning"
         );
         return;
       }
       if (activeTutorialStep === 4 && !tutorialActionsDone.helperClicked) {
-        alert(
-          "Syntax compiler calibration needed! Click the 'L [X] [Y]' button or enter path directives in the 'PLASMA CODER' terminal tab.",
+        addLogLine(
+          "[TUTORIAL] Syntax compiler calibration needed! Click 'L [X] [Y]' button or enter path directives in 'PLASMA CODER' tab.",
+          "text-warning"
         );
         return;
       }
@@ -1896,15 +1778,7 @@ function setupTutorialSystem() {
     );
   });
 
-  const completedTutorial = localStorage.getItem(
-    "geoglypher_completed_tutorial_v1",
-  );
-  if (!completedTutorial) {
-    localStorage.setItem("geoglypher_completed_tutorial_v1", "true");
-    setTimeout(() => {
-      openTutorial();
-    }, 1500);
-  }
+  localStorage.setItem("geoglypher_completed_tutorial_v1", "true");
 }
 
 function openTutorial() {
